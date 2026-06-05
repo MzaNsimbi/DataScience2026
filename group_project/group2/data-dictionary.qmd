@@ -1,0 +1,179 @@
+---
+title: "Yogurt Study — Data Dictionary"
+subtitle: "Group 2"
+author: "DataScience2026 Workshop"
+format:
+  html:
+    toc: true
+    code-fold: true
+    embed-resources: true
+editor: source
+---
+
+## Overview
+
+This document describes every CSV file in the yogurt study dataset. For each
+file, we explain what a single row represents and what every column means.
+
+The study looks at how eating yogurt affects the vaginal microbiome. There are
+**51 participants** split into two groups (called *arms*):
+
+- **yogurt** — 26 participants who ate yogurt
+- **unchanged_diet** — 25 participants who kept their normal diet
+
+Samples were taken at two time points for each participant:
+- **baseline** — before the study intervention
+- **after_antibiotic** — after a course of antibiotics
+
+```{r setup, message=FALSE, warning=FALSE}
+library(tidyverse)
+```
+
+---
+
+## 00\_sample\_ids\_yogurt.csv
+
+```{r sample-ids, message=FALSE}
+sample_ids <- read_csv("../../data/group_a_yogurt/00_sample_ids_yogurt.csv")
+glimpse(sample_ids)
+```
+
+**What one row represents:** A single sample — one participant at one time
+point.
+
+| Column | Type | Meaning |
+|--------|------|---------|
+| `pid` | character | Participant ID (e.g. `pid_25`). Links to `01_participant_metadata_yogurt.csv`. |
+| `time_point` | character | When the sample was taken: `baseline` or `after_antibiotic`. Each participant has both time points. |
+| `arm` | character | Which group the participant belongs to: `yogurt` or `unchanged_diet`. |
+| `sample_id` | character | Unique sample identifier (e.g. `UNCH001`, `YOG002`). Links to the qPCR and Luminex results. |
+
+There are **102 rows** (51 participants × 2 time points). Every participant
+appears twice — once at baseline and once after antibiotics.
+
+```{r sample-ids-summary, message=FALSE}
+sample_ids |>
+  count(arm, time_point) |>
+  knitr::kable(col.names = c("Arm", "Time point", "Samples"))
+```
+
+---
+
+## 01\_participant\_metadata\_yogurt.csv
+
+```{r metadata, message=FALSE}
+metadata <- read_csv("../../data/group_a_yogurt/01_participant_metadata_yogurt.csv")
+glimpse(metadata)
+```
+
+**What one row represents:** One participant's demographics and background
+information.
+
+| Column | Type | Meaning |
+|--------|------|---------|
+| `pid` | character | Participant ID. Matches `pid` in `00_sample_ids_yogurt.csv`. |
+| `arm` | character | Study arm: `yogurt` or `unchanged_diet`. |
+| `days_since_last_sex` | double | Days since the participant last had sex at the time of enrollment. |
+| `birth_control` | character | Type of birth control used: `no hormonal birth control` or `Depoprovera`. |
+| `age` | double | Participant's age in years. |
+| `education` | character | Highest education level: `less than grade 9`, `grade 10-12, not matriculated`, `grade 10-12, matriculated`, or `post-secondary`. |
+| `sex` | character | Sex assigned at birth. All participants are `female`. |
+
+There are **51 rows** — one per participant.
+
+```{r metadata-summary, message=FALSE}
+metadata |>
+  summarise(
+    n = n(),
+    avg_age = mean(age, na.rm = TRUE),
+    min_age = min(age, na.rm = TRUE),
+    max_age = max(age, na.rm = TRUE)
+  ) |>
+  knitr::kable(col.names = c("Participants", "Avg age", "Min age", "Max age"))
+```
+
+---
+
+## 02\_qpcr\_results\_yogurt.csv
+
+```{r qpcr, message=FALSE}
+qpcr <- read_csv("../../data/group_a_yogurt/02_qpcr_results_yogurt.csv")
+glimpse(qpcr)
+```
+
+**What one row represents:** Quantitative PCR (qPCR) measurements for one
+sample — measuring the amount of different bacteria present.
+
+| Column | Type | Meaning |
+|--------|------|---------|
+| `sample_id` | character | Unique sample ID. Matches `sample_id` in `00_sample_ids_yogurt.csv`. |
+| `qpcr_bacteria` | double | Total bacterial load — the overall amount of bacteria in the sample (gene copies per mL). |
+| `qpcr_crispatus` | double | Amount of *Lactobacillus crispatus*, a "good" bacterium that protects vaginal health (gene copies per mL). |
+| `qpcr_iners` | double | Amount of *Lactobacillus iners*, another *Lactobacillus* species that can be present in both healthy and less healthy states (gene copies per mL). |
+
+There are **102 rows** — one per sample (same as `00_sample_ids_yogurt.csv`).
+
+```{r qpcr-summary, message=FALSE}
+qpcr |>
+  summarise(across(where(is.numeric), ~ mean(.x, na.rm = TRUE))) |>
+  knitr::kable(
+    col.names = c("Avg total bacteria", "Avg L. crispatus", "Avg L. iners"),
+    digits = 2
+  )
+```
+
+---
+
+## 03\_luminex\_results\_yogurt.csv
+
+```{r luminex, message=FALSE}
+luminex <- read_csv("../../data/group_a_yogurt/03_luminex_results_yogurt.csv")
+glimpse(luminex)
+```
+
+**What one row represents:** The concentration of one cytokine measured in one
+sample. This file is in **long format** — each sample appears multiple times,
+once for each cytokine tested.
+
+| Column | Type | Meaning |
+|--------|------|---------|
+| `sample_id` | character | Unique sample ID. Matches `sample_id` in `00_sample_ids_yogurt.csv`. |
+| `cytokine` | character | Name of the cytokine measured. There are 10 different cytokines: `IL-1a`, `IL-1b`, `IL-6`, `IL-8`, `IL-10`, `IFN-Y`, `IP-10`, `MIG`, `MIP-3a`, `TNFa`. |
+| `conc` | double | Concentration of the cytokine in the sample (pg/mL). |
+| `limits` | character | Whether the concentration was within the detectable range: `within limits` or `out of range`. |
+
+There are **1,020 rows** — 102 samples × 10 cytokines.
+
+```{r luminex-summary, message=FALSE}
+luminex |>
+  count(limits) |>
+  knitr::kable(col.names = c("Measurement status", "Count"))
+```
+
+```{r luminex-cytokines, message=FALSE}
+luminex |>
+  count(cytokine) |>
+  knitr::kable(col.names = c("Cytokine", "Measurements"))
+```
+
+---
+
+## How the files connect
+
+```
+01_participant_metadata ──┬── pid ──┐
+                           │         │
+                           │   00_sample_ids ──┬── sample_id ──┐
+                           │                   │                │
+                           │    pid ────────────┘               │
+                           │                                    │
+                           │                         02_qpcr_results
+                           │                         03_luminex_results
+```
+
+- `01_participant_metadata` links to `00_sample_ids` through **`pid`**
+- `00_sample_ids` links to `02_qpcr_results` and `03_luminex_results` through
+  **`sample_id`**
+
+So if you want a participant's demographic info alongside their qPCR results,
+you'd join `01_metadata` → `00_sample_ids` → `02_qpcr_results`.

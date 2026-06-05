@@ -1,0 +1,325 @@
+---
+title: "Group A Yogurt Study — Bacteria Box Plots"
+subtitle: "Comparing unchanged diet vs yogurt arm at baseline and after antibiotics"
+format: html
+editor: source
+execute:
+  warning: false
+  message: false
+---
+
+```{r setup}
+#| include: false
+library(tidyverse)
+library(ggpubr)
+library(rstatix)
+library(here)
+```
+
+## About this file
+
+This Quarto document creates box plots for each bacteria measured in the
+Group A Yogurt study. For each bacteria you'll see **two panels side by
+side** — baseline on the left, after antibiotics on the right — each
+comparing the **unchanged diet** arm against the **yogurt** arm with a
+p-value.
+
+### What the bacteria columns mean
+
+| Column | What it measures |
+|--------|-------------------|
+| `qpcr_bacteria` | **Total bacteria** — all bacteria together |
+| `qpcr_crispatus` | ***Lactobacillus crispatus*** — a "good" bacteria linked to vaginal health |
+| `qpcr_iners` | ***Lactobacillus iners*** — another common species, less protective |
+
+```{r load-data}
+# Read the three data files
+samples <- read_csv(here("data/group_a_yogurt/00_sample_ids_yogurt.csv"))
+meta    <- read_csv(here("data/group_a_yogurt/01_participant_metadata_yogurt.csv"))
+qpcr    <- read_csv(here("data/group_a_yogurt/02_qpcr_results_yogurt.csv"))
+
+# Preview the qPCR data to see what we're working with
+glimpse(qpcr)
+```
+
+```{r merge-and-tidy}
+# Merge qPCR values with time_point and arm info
+df <- samples %>%
+  left_join(qpcr, by = "sample_id")
+
+# Clean up labels for nice-looking plots
+df <- df %>%
+  mutate(
+    arm = recode(arm,
+                 "unchanged_diet" = "Unchanged diet",
+                 "yogurt"         = "Yogurt"),
+    time_point = recode(time_point,
+                        "baseline"         = "Baseline",
+                        "after_antibiotic" = "After antibiotic"),
+    # Put time points in the right order (baseline first)
+    time_point = fct_relevel(time_point, "Baseline", "After antibiotic")
+  )
+
+# Pivot so each bacteria gets its own row
+df_long <- df %>%
+  pivot_longer(
+    cols      = c(qpcr_bacteria, qpcr_crispatus, qpcr_iners),
+    names_to  = "bacteria",
+    values_to = "value"
+  ) %>%
+  mutate(
+    bacteria = recode(bacteria,
+                      "qpcr_bacteria"  = "Total bacteria",
+                      "qpcr_crispatus" = "L. crispatus",
+                      "qpcr_iners"     = "L. iners"),
+    # Keep the right order
+    bacteria = fct_relevel(bacteria, "Total bacteria", "L. crispatus", "L. iners")
+  )
+
+head(df_long)
+```
+
+## Total bacteria
+
+```{r plot-total-bacteria}
+#| fig-width: 8
+#| fig-height: 5
+
+total_df <- df_long %>% filter(bacteria == "Total bacteria")
+
+# Compute p-values for each time point (Wilcoxon test — good for small samples)
+total_pvals <- total_df %>%
+  group_by(time_point) %>%
+  summarise(
+    p = wilcox.test(value ~ arm, exact = FALSE)$p.value,
+    .groups = "drop"
+  ) %>%
+  mutate(
+    label = paste0("Wilcoxon p = ", formatC(p, format = "e", digits = 2)),
+    # Position the label at the top-right of each panel
+    y_pos = total_df %>%
+      group_by(time_point) %>%
+      summarise(max_val = max(value, na.rm = TRUE) * 1.15, .groups = "drop") %>%
+      pull(max_val)
+  )
+
+ggplot(total_df, aes(x = arm, y = value, fill = arm)) +
+  geom_boxplot(outlier.shape = NA, alpha = 0.6) +
+  geom_jitter(width = 0.15, size = 2, alpha = 0.5, color = "grey40") +
+  facet_wrap(~ time_point) +
+  scale_fill_manual(values = c("Unchanged diet" = "#4A90D9", "Yogurt" = "#E8833A")) +
+  # Add p-value labels
+  geom_text(
+    data    = total_pvals,
+    aes(x = 2.3, y = y_pos, label = label),
+    inherit.aes = FALSE,
+    hjust = 1, vjust = 1, size = 3.5, color = "grey30"
+  ) +
+  labs(
+    title    = "Total bacteria",
+    subtitle = "Unchanged diet vs Yogurt arm",
+    x        = NULL,
+    y        = "Bacterial load (copies/mL)",
+    fill     = "Arm"
+  ) +
+  theme_bw(base_size = 14) +
+  theme(
+    strip.text       = element_text(face = "bold", size = 13),
+    plot.title       = element_text(face = "bold", hjust = 0.5, size = 16),
+    plot.subtitle    = element_text(hjust = 0.5, color = "grey40"),
+    legend.position  = "bottom"
+  )
+```
+
+**What this shows:** Total bacteria count in each arm, at baseline and
+after antibiotics. Each dot is one participant. The box shows the
+middle 50% of values, the line inside is the median.
+
+---
+
+## *Lactobacillus crispatus*
+
+```{r plot-crispatus}
+#| fig-width: 8
+#| fig-height: 5
+
+crispatus_df <- df_long %>% filter(bacteria == "L. crispatus")
+
+# Compute p-values
+crispatus_pvals <- crispatus_df %>%
+  group_by(time_point) %>%
+  summarise(
+    p = wilcox.test(value ~ arm, exact = FALSE)$p.value,
+    .groups = "drop"
+  ) %>%
+  mutate(
+    label = paste0("Wilcoxon p = ", formatC(p, format = "e", digits = 2)),
+    y_pos = crispatus_df %>%
+      group_by(time_point) %>%
+      summarise(max_val = max(value, na.rm = TRUE) * 1.15, .groups = "drop") %>%
+      pull(max_val)
+  )
+
+ggplot(crispatus_df, aes(x = arm, y = value, fill = arm)) +
+  geom_boxplot(outlier.shape = NA, alpha = 0.6) +
+  geom_jitter(width = 0.15, size = 2, alpha = 0.5, color = "grey40") +
+  facet_wrap(~ time_point) +
+  scale_fill_manual(values = c("Unchanged diet" = "#4A90D9", "Yogurt" = "#E8833A")) +
+  geom_text(
+    data    = crispatus_pvals,
+    aes(x = 2.3, y = y_pos, label = label),
+    inherit.aes = FALSE,
+    hjust = 1, vjust = 1, size = 3.5, color = "grey30"
+  ) +
+  labs(
+    title    = "Lactobacillus crispatus",
+    subtitle = "Unchanged diet vs Yogurt arm",
+    x        = NULL,
+    y        = "Bacterial load (copies/mL)",
+    fill     = "Arm"
+  ) +
+  theme_bw(base_size = 14) +
+  theme(
+    strip.text       = element_text(face = "bold", size = 13),
+    plot.title       = element_text(face = "bold", hjust = 0.5, size = 16),
+    plot.subtitle    = element_text(hjust = 0.5, color = "grey40"),
+    legend.position  = "bottom"
+  )
+```
+
+**What this shows:** *L. crispatus* levels. Notice many participants have
+zero (0) — this bacteria is not present in everyone. The p-value tells
+you if the difference between arms is bigger than what you'd expect by
+chance.
+
+---
+
+## *Lactobacillus iners*
+
+```{r plot-iners}
+#| fig-width: 8
+#| fig-height: 5
+
+iners_df <- df_long %>% filter(bacteria == "L. iners")
+
+# Compute p-values
+iners_pvals <- iners_df %>%
+  group_by(time_point) %>%
+  summarise(
+    p = wilcox.test(value ~ arm, exact = FALSE)$p.value,
+    .groups = "drop"
+  ) %>%
+  mutate(
+    label = paste0("Wilcoxon p = ", formatC(p, format = "e", digits = 2)),
+    y_pos = iners_df %>%
+      group_by(time_point) %>%
+      summarise(max_val = max(value, na.rm = TRUE) * 1.15, .groups = "drop") %>%
+      pull(max_val)
+  )
+
+ggplot(iners_df, aes(x = arm, y = value, fill = arm)) +
+  geom_boxplot(outlier.shape = NA, alpha = 0.6) +
+  geom_jitter(width = 0.15, size = 2, alpha = 0.5, color = "grey40") +
+  facet_wrap(~ time_point) +
+  scale_fill_manual(values = c("Unchanged diet" = "#4A90D9", "Yogurt" = "#E8833A")) +
+  geom_text(
+    data    = iners_pvals,
+    aes(x = 2.3, y = y_pos, label = label),
+    inherit.aes = FALSE,
+    hjust = 1, vjust = 1, size = 3.5, color = "grey30"
+  ) +
+  labs(
+    title    = "Lactobacillus iners",
+    subtitle = "Unchanged diet vs Yogurt arm",
+    x        = NULL,
+    y        = "Bacterial load (copies/mL)",
+    fill     = "Arm"
+  ) +
+  theme_bw(base_size = 14) +
+  theme(
+    strip.text       = element_text(face = "bold", size = 13),
+    plot.title       = element_text(face = "bold", hjust = 0.5, size = 16),
+    plot.subtitle    = element_text(hjust = 0.5, color = "grey40"),
+    legend.position  = "bottom"
+  )
+```
+
+---
+
+## Bonus: All three bacteria in one figure
+
+This puts all bacteria together so you can compare the patterns at a
+glance.
+
+```{r plot-all-bacteria}
+#| fig-width: 10
+#| fig-height: 8
+
+# Compute all p-values at once
+all_pvals <- df_long %>%
+  group_by(bacteria, time_point) %>%
+  summarise(
+    p = wilcox.test(value ~ arm, exact = FALSE)$p.value,
+    .groups = "drop"
+  ) %>%
+  mutate(
+    label = paste0("p = ", formatC(p, format = "e", digits = 2)),
+    y_pos = df_long %>%
+      group_by(bacteria, time_point) %>%
+      summarise(max_val = max(value, na.rm = TRUE) * 1.15, .groups = "drop") %>%
+      pull(max_val)
+  )
+
+ggplot(df_long, aes(x = arm, y = value, fill = arm)) +
+  geom_boxplot(outlier.shape = NA, alpha = 0.6) +
+  geom_jitter(width = 0.15, size = 1.5, alpha = 0.4, color = "grey40") +
+  facet_grid(bacteria ~ time_point, scales = "free_y") +
+  scale_fill_manual(values = c("Unchanged diet" = "#4A90D9", "Yogurt" = "#E8833A")) +
+  geom_text(
+    data    = all_pvals,
+    aes(x = 2.3, y = y_pos, label = label),
+    inherit.aes = FALSE,
+    hjust = 1, vjust = 1, size = 3.2, color = "grey30"
+  ) +
+  labs(
+    title    = "qPCR Bacteria — Yogurt vs Unchanged Diet",
+    subtitle = "Comparison at baseline and after antibiotic",
+    x        = NULL,
+    y        = "Bacterial load (copies/mL)",
+    fill     = "Arm"
+  ) +
+  theme_bw(base_size = 13) +
+  theme(
+    strip.text       = element_text(face = "bold", size = 11),
+    plot.title       = element_text(face = "bold", hjust = 0.5, size = 15),
+    plot.subtitle    = element_text(hjust = 0.5, color = "grey40"),
+    legend.position  = "bottom"
+  )
+```
+
+---
+
+## Quick summary table
+
+```{r summary-table}
+df_long %>%
+  group_by(bacteria, time_point, arm) %>%
+  summarise(
+    n        = n(),
+    mean     = mean(value, na.rm = TRUE) %>% round(0),
+    median   = median(value, na.rm = TRUE) %>% round(0),
+    min      = min(value, na.rm = TRUE) %>% round(0),
+    max      = max(value, na.rm = TRUE) %>% round(0),
+    .groups  = "drop"
+  ) %>%
+  mutate(across(where(is.numeric), ~ format(., big.mark = ",")))
+```
+
+---
+
+## How to re-run this tomorrow
+
+Open this file in RStudio and click the **Render** button (or
+`Ctrl`/`Cmd` + `Shift` + `K`). Quarto will run all the code and create
+an HTML file with the plots. You can also knit individual chunks by
+clicking the green play arrow on each code block.

@@ -1,0 +1,491 @@
+---
+title: "Yogurt & the Vaginal Microbiome After Antibiotics — Group Report"
+format:
+  html:
+    toc: true
+    code-fold: true
+    embed-resources: true
+execute:
+  warning: false
+  message: false
+---
+
+> A workshop project analysing how yogurt consumption affects the vaginal
+> microbiome in women taking antibiotics.
+
+```{r setup}
+library(tidyverse)
+library(here)
+library(gtsummary)
+library(ggpubr)
+
+# ── Read all 4 data files ──────────────────────────────────────────
+samples  <- read_csv(here("data/group_a_yogurt/00_sample_ids_yogurt.csv"))
+metadata <- read_csv(
+  here("data/group_a_yogurt/01_participant_metadata_yogurt.csv"),
+  col_types = cols(sex = col_character())
+)
+qpcr     <- read_csv(here("data/group_a_yogurt/02_qpcr_results_yogurt.csv"))
+luminex  <- read_csv(here("data/group_a_yogurt/03_luminex_results_yogurt.csv"))
+```
+
+---
+
+## Q1 — Which variable defines the groups you want to compare?
+
+```{r}
+# The grouping variable is `arm`
+metadata |>
+  count(arm)
+```
+
+**Answer:** The variable **`arm`** defines the groups. It has two levels:
+
+| Value | Meaning | N |
+|---|---|---|
+| `yogurt` | Ate yogurt daily after antibiotics | 26 |
+| `unchanged_diet` | Kept usual diet (control) | 25 |
+
+Every comparison in this report is **yogurt vs. unchanged_diet** at the
+"after_antibiotic" time point (or baseline → after change).
+
+---
+
+## Q2 — Which demographic and baseline variables belong in your Table 1?
+
+**Answer:** The variables that describe participants *before* the intervention
+and could potentially differ between arms (even with randomisation):
+
+| Variable | Type | Why it goes in Table 1 |
+|---|---|---|
+| `age` | Continuous | Could affect immune response and microbiome |
+| `education` | Categorical | Proxy for socioeconomic factors |
+| `birth_control` | Categorical | Hormonal BC affects the vaginal microbiome |
+| `days_since_last_sex` | Continuous | Recent sex can temporarily alter the microbiome |
+| ~~`sex`~~ | Constant | All female — skip it |
+| ~~`pid`~~ | ID | Not a variable — skip it |
+
+### Table 1
+
+```{r}
+# ── Table 1 ────────────────────────────────────────────────────────
+metadata |>
+  select(-pid, -sex) |>
+  tbl_summary(
+    by = arm,
+    statistic = list(age ~ "{mean} ({sd})")
+  ) |>
+  add_p(
+    test = list(age ~ "t.test")
+  ) |>
+  add_overall() |>
+  bold_labels() |>
+  modify_header(label ~ "**Characteristic**")
+```
+
+**Interpretation:**
+
+- **Age, education, days_since_last_sex** — well balanced (p > 0.05). The
+  randomisation did its job for these.
+- **birth_control** — imbalanced (p = 0.017). The yogurt arm has twice as
+  many Depoprovera users (65% vs 32%). This is worth noting because
+  hormonal contraception can affect vaginal *Lactobacillus* levels. If
+  we see a difference between arms in the outcomes, we may need to check
+  whether birth control is driving it, not the yogurt.
+
+---
+
+## Q3 — Which outcome variables are most relevant to your question?
+
+**Original question:** *How does yogurt affect the vaginal microbiome in
+response to antibiotics?*
+
+```{r}
+# ── What qPCR outcomes are available ───────────────────────────────
+qpcr |>
+  select(-sample_id) |>
+  names()
+```
+
+```{r}
+# ── What cytokines are available ───────────────────────────────────
+luminex |>
+  distinct(cytokine) |>
+  pull(cytokine)
+```
+
+**Answer:**
+
+| Outcome | Data source | What it measures | Relevance |
+|---|---|---|---|
+| `qpcr_crispatus` | qPCR | *L. crispatus* — the "gold standard" protective species | **High** — should increase if yogurt helps |
+| `qpcr_iners` | qPCR | *L. iners* — a less stable species, marker of dysbiosis | **High** — should decrease with recovery |
+| `qpcr_bacteria` | qPCR | Total bacterial load | Medium — context |
+| Cytokines (IL-1a, IL-6, IL-8, IL-1b, IP-10, MIG, etc.) | Luminex | Immune/inflammatory proteins in vaginal fluid | **High** — lower = less inflammation |
+
+---
+
+## Q4 — For each outcome, what kind of comparison makes sense?
+
+```{r}
+# ── Join qPCR with sample info to see what time points exist ───────
+qpcr_joined <- qpcr |>
+  left_join(samples, by = "sample_id")
+
+qpcr_joined |>
+  count(arm, time_point)
+```
+
+**Answer:** Two comparison types, each answering a different question:
+
+### A) Independent groups at one time point (primary)
+
+Compare `yogurt` vs `unchanged_diet` **at the after_antibiotic visit only**.
+
+- **Question:** Did the yogurt group end up with a healthier microbiome?
+- **Test:** Wilcoxon rank-sum test (two independent groups)
+- **Applies to:** All outcomes (qPCR, cytokines)
+
+### B) Paired pre-post within each arm
+
+Compare each participant's *baseline* value to their *after_antibiotic* value,
+separately for each arm.
+
+- **Question:** Did each group change significantly from before to after?
+- **Test:** Wilcoxon signed-rank test (paired)
+- **Applies to:** qPCR outcomes only (we have both time points)
+
+### Summary table
+
+| Outcome | Comparison A (independent) | Comparison B (paired) |
+|---|---|---|
+| `qpcr_crispatus` | ✅ Primary: yogurt vs control at after_antibiotic | ✅ Did crispatus increase from baseline? |
+| `qpcr_iners` | ✅ Secondary | ✅ Did iners decrease from baseline? |
+| Cytokines | ✅ Primary: yogurt vs control at after_antibiotic | ❌ Only measured after_antibiotic |
+
+---
+
+## Q5 — Which `ggpubr` plot best shows that comparison?
+
+### A) Independent groups — boxplot (crispatus) / Paired-change boxplot (iners)
+
+Best for comparing yogurt vs control at after_antibiotic. For *L. iners* the
+paired change (after_antibiotic − baseline) is shown as a boxplot with
+individual points, following your preference.
+
+```{r}
+#| fig-width: 7
+#| fig-height: 5
+# ── Prepare qPCR data for plotting ─────────────────────────────
+qpcr_after <- qpcr |>
+  left_join(samples, by = "sample_id") |>
+  filter(time_point == "after_antibiotic")
+
+# ── L. crispatus: boxplot by arm ───────────────────────────────
+ggboxplot(qpcr_after,
+  x = "arm", y = "qpcr_crispatus",
+  fill = "arm", palette = "jco",
+  add = "jitter"
+) +
+  stat_compare_means(method = "wilcox.test", label.x = 1.3) +
+  labs(
+    y = expression(italic("L. crispatus") ~ "(copies / µL)"),
+    title = expression(italic("L. crispatus") ~ "after antibiotics")
+  ) +
+  theme(legend.position = "none")
+```
+
+```{r}
+#| fig-width: 7
+#| fig-height: 5
+# ── Compute paired change in L. iners ────────────────────────────
+iners_change <- qpcr |>
+  left_join(samples, by = "sample_id") |>
+  filter(time_point %in% c("baseline", "after_antibiotic")) |>
+  select(pid, arm, time_point, qpcr_iners) |>
+  pivot_wider(names_from = time_point, values_from = qpcr_iners) |>
+  mutate(change = after_antibiotic - baseline)
+
+# ── Boxplot of the paired change, by arm ────────────────────────
+ggboxplot(iners_change,
+  x = "arm", y = "change",
+  fill = "arm", palette = "jco",
+  add = "jitter"
+) +
+  stat_compare_means(method = "wilcox.test", label.x = 1.3) +
+  labs(
+    y = expression(italic("L. iners") ~ "change (after − baseline, copies / µL)"),
+    title = expression(italic("L. iners") ~ "— paired change after antibiotics")
+  ) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "grey50") +
+  theme(legend.position = "none")
+```
+
+### B) Paired pre-post — connected line plot
+
+Best for showing change within each arm.
+
+```{r}
+#| fig-width: 9
+#| fig-height: 5
+# ── Prepare paired data ────────────────────────────────────────
+qpcr_prepost <- qpcr |>
+  left_join(samples, by = "sample_id") |>
+  filter(time_point %in% c("baseline", "after_antibiotic")) |>
+  mutate(time_point = fct_relevel(time_point, "baseline", "after_antibiotic"))
+
+# ── L. crispatus: paired plot ──────────────────────────────────
+ggplot(qpcr_prepost, aes(time_point, qpcr_crispatus)) +
+  geom_line(aes(group = pid), alpha = 0.3, color = "grey50") +
+  geom_point(aes(color = arm), size = 2, alpha = 0.7) +
+  facet_wrap(~ arm) +
+  scale_color_manual(values = c("unchanged_diet" = "#E64B35", "yogurt" = "#4DABD7")) +
+  stat_compare_means(
+    method = "wilcox.test",
+    paired = TRUE,
+    comparisons = list(c("baseline", "after_antibiotic")),
+    label.y = max(qpcr_prepost$qpcr_crispatus, na.rm = TRUE) * 0.95
+  ) +
+  labs(
+    x = "Time point",
+    y = expression(italic("L. crispatus") ~ "(copies / µL)"),
+    title = expression(italic("L. crispatus") ~ "— baseline → after antibiotics")
+  ) +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+
+
+### C) Total bacteria — boxplot by arm
+
+Compares total bacterial load between the yogurt and unchanged-diet groups
+after antibiotics. Each point is one participant.
+
+```{r}
+#| fig-width: 7
+#| fig-height: 5
+# ── Total bacteria: boxplot by arm ───────────────────────────
+ggboxplot(qpcr_after,
+  x = "arm", y = "qpcr_bacteria",
+  fill = "arm", palette = "jco",
+  add = "jitter"
+) +
+  stat_compare_means(method = "wilcox.test", label.x = 1.3) +
+  labs(
+    y = "Total bacteria (gene copies / µL)",
+    title = "Total bacteria after antibiotics"
+  ) +
+  theme(legend.position = "none")
+```
+
+### D) Cytokine panel — faceted boxplots
+
+Best for comparing multiple immune markers side by side.
+
+```{r}
+#| fig-width: 10
+#| fig-height: 7
+# ── Prepare cytokine data ──────────────────────────────────────
+cytokines_keep <- c("IL-1a", "IL-6", "IL-8", "IL-1b", "MIG", "IP-10")
+
+cytokine_df <- luminex |>
+  filter(cytokine %in% cytokines_keep, limits == "within limits") |>
+  left_join(samples, by = "sample_id") |>
+  filter(time_point == "after_antibiotic")
+
+# ── Faceted boxplot panel ──────────────────────────────────────
+ggplot(cytokine_df, aes(arm, conc, fill = arm)) +
+  geom_boxplot(outlier.shape = NA, alpha = 0.7) +
+  geom_jitter(width = 0.15, alpha = 0.5, size = 1.5) +
+  facet_wrap(~ cytokine, scales = "free_y", nrow = 2) +
+  scale_fill_manual(values = c("unchanged_diet" = "#E64B35", "yogurt" = "#4DABD7")) +
+  stat_compare_means(method = "wilcox.test", label.x = 1.3, size = 3) +
+  labs(
+    x = "Arm",
+    y = "Concentration (pg/mL)",
+    title = "Vaginal cytokines after antibiotics"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "bottom",
+    strip.text = element_text(face = "bold")
+  )
+```
+
+### E) Bacteria boxplots — both time points, by arm
+
+For each bacterial target, a boxplot showing baseline on the left and
+after_antibiotic on the right, with the two arms side by side at each time
+point. P-values compare unchanged_diet vs yogurt within each time point.
+
+```{r}
+#| fig-width: 9
+#| fig-height: 14
+#| message: false
+# ── Prepare data ───────────────────────────────────────────────
+qpcr_data <- qpcr |>
+  left_join(samples, by = "sample_id") |>
+  filter(time_point %in% c("baseline", "after_antibiotic")) |>
+  mutate(time_point = fct_relevel(time_point, "baseline", "after_antibiotic"))
+
+# ── Helper: one boxplot for a given bacteria column ────────────
+make_bp <- function(data, y_col, y_label, title_text) {
+  ggplot(data, aes(time_point, {{ y_col }}, fill = arm)) +
+    geom_boxplot(outlier.shape = NA, alpha = 0.7) +
+    geom_jitter(aes(color = arm), width = 0.15, alpha = 0.4, size = 1.2) +
+    scale_fill_manual(values = c("unchanged_diet" = "#E64B35", "yogurt" = "#4DABD7")) +
+    scale_color_manual(values = c("unchanged_diet" = "#E64B35", "yogurt" = "#4DABD7")) +
+    stat_compare_means(aes(group = arm), label = "p.format", method = "wilcox.test") +
+    labs(x = "Time point", y = y_label, title = title_text) +
+    theme_minimal() +
+    theme(legend.position = "bottom")
+}
+
+# ── Three boxplots stacked vertically ──────────────────────────
+library(patchwork)
+
+p_bact <- make_bp(qpcr_data, qpcr_bacteria,
+  "Gene copies / \u00B5L", "Total bacteria")
+p_cris <- make_bp(qpcr_data, qpcr_crispatus,
+  expression(italic("L. crispatus") ~ "(copies / \u00B5L)"),
+  expression(italic("L. crispatus")))
+p_iners <- make_bp(qpcr_data, qpcr_iners,
+  expression(italic("L. iners") ~ "(copies / \u00B5L)"),
+  expression(italic("L. iners")))
+
+p_bact / p_cris / p_iners
+```
+
+---
+
+## Q6 — What does a p-value mean in the context of your comparison?
+
+### What it *does* tell you
+
+> If yogurt truly had **no effect** (the null hypothesis is true), how likely
+> would we be to see a difference this big (or bigger) just by random chance?
+
+**Example:** If the *crispatus* boxplot shows p = 0.03, it means:
+> "There's only a 3% chance of seeing this much difference between the
+> yogurt and control groups if yogurt actually does nothing."
+
+| If p is ... | We say ... |
+|---|---|
+| p < 0.05 | "Statistically significant" — unlikely to be chance |
+| p ≥ 0.05 | "Not statistically significant" — could be chance |
+
+### What a p-value does **NOT** tell you
+
+| ❌ It does NOT mean ... | Why ... |
+|---|---|
+| "The effect is large" | A tiny effect can be significant with enough people |
+| "The effect is important" | Statistical significance ≠ clinical/practical importance |
+| "Yogurt definitely works" | p-values can't prove causation |
+| "There's a 95% chance yogurt works" | That's a different quantity (Bayesian, not frequentist) |
+| "The result will replicate" | One study, one p-value — replication is separate |
+| "The study was well-designed" | Confounding, bias, small samples all affect what p means |
+
+### In your study specifically
+
+Even if the *crispatus* p-value is > 0.05 (not significant), it doesn't mean
+"yogurt didn't help." With only 51 participants, the study may simply be
+**underpowered** — too small to detect a real but modest effect.
+
+Conversely, if the *birth control imbalance* (p = 0.017 in Table 1) is real,
+it could **confound** the results. A significant p-value for *crispatus*
+might partly reflect the hormonal BC difference, not the yogurt.
+
+---
+
+## Q7 — What surprised you in the results?
+
+```{r}
+# ── Quick summary stats to look for surprises ──────────────────
+qpcr_after |>
+  group_by(arm) |>
+  summarise(
+    n = n(),
+    crispatus_median = median(qpcr_crispatus, na.rm = TRUE),
+    crispatus_zero_pct = mean(qpcr_crispatus == 0, na.rm = TRUE) * 100,
+    iners_median = median(qpcr_iners, na.rm = TRUE)
+  )
+```
+
+```{r}
+# ── How many participants have zero crispatus? ─────────────────
+qpcr_after |>
+  count(arm, zero_crispatus = qpcr_crispatus == 0)
+```
+
+**Check these things and note what surprises you below:**
+
+1. **Zero inflation** — How many women have *zero* detectable *L. crispatus*
+   after antibiotics? If it's most of them, that's a striking finding.
+
+2. **Outliers** — Are there one or two participants with extremely high values
+   that might be driving a significant p-value all by themselves?
+
+3. **The birth control imbalance** — Could the Depoprovera imbalance in Table 1
+   (p = 0.017) explain any arm differences you see in the outcomes?
+
+4. **Cytokine surprises** — Are any cytokines *higher* in the yogurt group
+   than the control (counterintuitive)? Which ones?
+
+5. **Median vs mean** — If the median and mean are very different, the data
+   are skewed. The Wilcoxon test is better for skewed data than a t-test.
+
+```{r}
+# ── Write your surprises here (plain text) ─────────────────────
+```
+
+> **Your observations:**
+>
+> 1.
+> 2.
+> 3.
+
+---
+
+## Summary
+
+| Question | Answer |
+|---|---|
+| **Grouping variable** | `arm` (yogurt vs unchanged_diet) |
+| **Table 1 variables** | age, education, birth_control, days_since_last_sex |
+| **Key outcomes** | `qpcr_crispatus`, `qpcr_iners`, cytokines |
+| **Primary comparison** | Independent groups at after_antibiotic (Wilcoxon rank-sum) |
+| **Secondary comparison** | Paired pre-post within each arm (Wilcoxon signed-rank) |
+| **Best plots** | Boxplot + jitter (independent); connected line plot (paired); faceted boxplot panel (cytokines) |
+| **P-value limits** | Tells you about chance, not about size, importance, or causation |
+ ```r                                                                                          
+   library(tidyverse)                                                                          
+   library(ggpubr)                                                                             
+                                                                                               
+   # Read data                                                                                 
+   samples  <- read_csv("data/group_a_yogurt/00_sample_ids_yogurt.csv")                        
+   qpcr     <- read_csv("data/group_a_yogurt/02_qpcr_results_yogurt.csv")                      
+                                                                                               
+   # Compute paired change (after_antibiotic - baseline)                                       
+   iners_change <- qpcr |>                                                                     
+     left_join(samples, by = "sample_id") |>                                                   
+     filter(time_point %in% c("baseline", "after_antibiotic")) |>                              
+     select(pid, arm, time_point, qpcr_iners) |>                                               
+     pivot_wider(names_from = time_point, values_from = qpcr_iners) |>                         
+     mutate(change = after_antibiotic - baseline)                                              
+                                                                                               
+   # Boxplot of the paired change                                                              
+   ggboxplot(iners_change,                                                                     
+     x = "arm", y = "change",                                                                  
+     fill = "arm", palette = "jco",                                                            
+     add = "jitter"                                                                            
+   ) +                                                                                         
+     stat_compare_means(method = "wilcox.test", label.x = 1.3) +                               
+     labs(                                                                                     
+       y = expression(italic("L. iners") ~ "change (after - baseline, copies / µL)"),          
+       title = expression(italic("L. iners") ~ "- paired change after antibiotics")            
+     ) +                                                                                       
+     geom_hline(yintercept = 0, linetype = "dashed", color = "grey50") +                       
+     theme(legend.position = "none")                                                           
+ ``` 
+ 

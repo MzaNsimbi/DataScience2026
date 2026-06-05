@@ -1,0 +1,9 @@
+---
+title: "Group A — Data Dossier"
+format:
+  html:
+    toc: true
+    code-fold: true
+    embed-resources: true
+---
+

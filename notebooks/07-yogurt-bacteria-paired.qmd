@@ -1,0 +1,836 @@
+---
+title: "Group A Yogurt Study — Paired Bacteria Analysis"
+subtitle: "How bacteria levels changed from baseline to after antibiotics, by arm"
+format: html
+editor: source
+execute:
+  warning: false
+  message: false
+---
+
+```{r setup}
+#| include: false
+library(tidyverse)
+library(ggpubr)
+library(rstatix)
+library(gtsummary)
+library(here)
+```
+
+---
+
+## Study Notes (read this first!)
+
+### Aim of the study
+
+The main goal of this study was to find out whether **eating yoghurt**
+helps protect the vaginal microbes (bacteria) when a person takes
+antibiotics. Antibiotics can kill both the bad bacteria causing an
+infection AND the good bacteria that keep the vagina healthy, which can
+lead to problems like yeast infections or bacterial vaginosis. The idea
+is that yoghurt (which contains good bacteria like *Lactobacillus*)
+might help restore or protect the vaginal microbiome.
+
+### Objectives
+
+1. Measure the levels of key vaginal bacteria at **baseline** (before
+   any antibiotics) and **after taking antibiotics**
+2. Compare what happens in two groups of participants:
+   - **Unchanged diet** — people who went about their normal diet
+   - **Yoghurt** — people who ate yoghurt during the study
+3. See if the yoghurt group had better preservation of "good" bacteria
+   (*L. crispatus*) compared to the unchanged diet group
+4. Use statistical tests (p-values) to decide if any differences we see
+   are real or just by chance
+
+### How the study was conducted
+
+Here's a simple walkthrough of the study design:
+
+```
+Step 1: Recruit participants (total N = 51 women)
+                |
+Step 2: Divide into two arms
+        ├── Unchanged diet (~25 women) — eat as usual
+        └── Yoghurt (~26 women) — eat yoghurt daily
+                |
+Step 3: Take baseline sample (swab) → measure bacteria
+                |
+Step 4: Everyone takes antibiotics (for an infection)
+                |
+Step 5: Take after-antibiotic sample → measure bacteria again
+                |
+Step 6: Compare: Did bacteria change? Did yoghurt help?
+```
+
+**Key idea — "Paired" design:** Each woman is measured twice (before
+and after antibiotics). This is powerful because each person acts as
+her **own control**. We're not comparing different people — we're
+comparing each person to herself before and after. This removes a lot
+of natural differences between people (everyone's microbiome is a
+bit different).
+
+### What we measured (the bacteria)
+
+The researchers used a technique called **qPCR** (quantitative PCR) to
+count how many copies of bacterial DNA were in each sample. Think of it
+like a microscope that can count individual bacteria. They looked at:
+
+| Bacteria column | What it means | Why it matters |
+|----------------|---------------|----------------|
+| `qpcr_bacteria` | **Total bacteria** — all bacteria combined | Gives us a sense of the overall bacterial community |
+| `qpcr_crispatus` | ***Lactobacillus crispatus*** — a "good" bacteria | This species produces hydrogen peroxide which kills bad bacteria. High levels = healthy vaginal environment |
+| `qpcr_iners` | ***Lactobacillus iners*** — another *Lactobacillus* species | Less protective than *crispatus*. Can switch between helpful and harmful depending on conditions |
+
+### How we made the graphs (explained simply)
+
+**Step 1 — Gather the data:** We read three CSV files — one with
+the participant IDs and which group they were in, one with the
+time point (baseline vs after antibiotic), and one with the qPCR
+bacteria counts. We merged them together so every row has:
+*who* the person is + *when* the sample was taken + *which group*
+they belong to + *how much* bacteria was found.
+
+**Step 2 — Organise the data:** We reshaped the data so each bacteria
+(Total, *L. crispatus*, *L. iners*) becomes its own row. This makes
+it easier to create one graph per bacteria.
+
+**Step 3 — Create the plots:** For each bacteria, we drew:
+- **Grey lines** connecting each person's two measurements (baseline
+  → after antibiotic). Each line is one woman. If the line goes down,
+  her bacteria decreased. If it goes up, it increased.
+- **Box plots** showing the overall pattern for the group. The box
+  shows the middle 50% of values, the line inside is the median
+  (middle value), and the "whiskers" show the range.
+- **Dots** for each individual measurement, coloured by arm.
+- **P-values** calculated using a paired Wilcoxon test. This is a
+  statistical test that asks: "Is the change from before to after
+  antibiotics big enough that we can be confident it's not just
+  random noise?"
+
+**Step 4 — Build the tables:** For each bacteria and each arm, we
+counted how many participants had detectable levels (n, %), calculated
+the median (middle value) and IQR (spread), and added the p-value.
+
+### Understanding p-values (simple explanation)
+
+A p-value tells you the probability that what you're seeing happened
+by random chance alone. 
+
+- **p < 0.05** — less than 5% chance it's random. We call this
+  "statistically significant". The difference is probably real.
+- **p < 0.01** — less than 1% chance. Strong evidence of a real
+  difference.
+- **p < 0.001** — less than 0.1% chance. Very strong evidence.
+- **p > 0.05** — not statistically significant. The difference could
+  easily be due to random chance. We can't confidently say there's
+  a real difference.
+
+Note: A high p-value doesn't mean "no difference". It means "we don't
+have enough evidence to say there IS a difference". With only ~25
+people per group, sometimes real differences are missed because the
+sample is too small.
+
+### Advantages of this study design
+
+| Advantage | Why it's good |
+|-----------|---------------|
+| **Paired design** | Each person is their own control. This removes the natural variation between different people, making it easier to spot real changes |
+| **Two time points** | We see the *change* over time, not just a snapshot. This tells us about the effect of antibiotics + yoghurt |
+| **qPCR measurement** | qPCR is very precise — it can detect tiny amounts of bacterial DNA, giving accurate counts |
+| **Wilcoxon test** | This test doesn't assume the data follows a bell curve (normal distribution). Our data has many zeros and is very skewed, so this is the right choice |
+| **Detection rates** | We show both how many people have the bacteria AND how much. This gives a complete picture |
+
+### Disadvantages and limitations
+
+| Limitation | Why it matters |
+|------------|----------------|
+| **Small sample size** | About 25 people per arm. With small groups, it's harder to detect real differences (low "statistical power") |
+| **No randomisation info** | We don't know how people were assigned to yoghurt vs unchanged diet. If it wasn't random, the groups might be different in ways that affect the results |
+| **Short follow-up** | Only one time point after antibiotics. We don't know if changes lasted or if people recovered |
+| **No placebo** | People knew whether they were eating yoghurt or not. This could affect behaviour (placebo effect) |
+| **Many zeros** | *L. crispatus* especially has many zero values (not detected). This makes statistical analysis harder and means median values are often 0 |
+| **Single measurement method** | Only qPCR was used. Other methods (like 16S sequencing) might give a broader picture of all bacteria present |
+| **Confounding factors** | Things like age, birth control, sexual activity, and diet outside yoghurt could influence the results. We haven't adjusted for these in these simple plots |
+
+### Summary and key takeaways
+
+Based on the graphs and tables in this document:
+
+1. **Total bacteria** — After antibiotics, total bacteria levels tend
+   to decrease in both groups. The p-values will tell us if the
+   decrease is significant and whether the yoghurt group fared better.
+
+2. ***L. crispatus*** — This is the key "good" bacteria we care about.
+   Antibiotics often wipe it out. If yoghurt helps, we might see
+   *crispatus* levels dropping less (or recovering more) in the
+   yoghurt group. However, many participants start with zero, which
+   makes it hard to show protection.
+
+3. ***L. iners*** — This species is more mixed in its effects. It
+   might increase after antibiotics as it fills the space left by
+   other bacteria. The yoghurt group might show different patterns.
+
+4. **Overall** — The paired plots (grey lines connecting before →
+   after) are the most informative: they show individual trajectories.
+   Look for patterns where most lines go in one direction (all down
+   or all up) — that's a strong signal. If lines go every which way,
+   there's no clear effect.
+
+**What to look for in each graph:**
+- Do most grey lines go down? → Bacteria decreased after antibiotics
+- Is the decrease smaller in the yoghurt group? → Yoghurt might help
+- Is the p-value < 0.05? → The change is statistically significant
+- Are the detection rates similar at both time points? → Bacteria were
+  preserved
+
+### Why this matters
+
+Vaginal health is important for preventing infections, especially in
+women. If something as simple as eating yoghurt can protect the vaginal
+microbiome during antibiotic treatment, it could be an easy,
+low-cost recommendation for doctors to give their patients. This study
+is a step toward understanding that question.
+
+---
+
+## About this file
+
+This document shows how bacteria changed from **baseline** to **after
+antibiotic** for each participant, split by diet arm (**unchanged
+diet** vs **yogurt**). Each section has:
+
+1. A **table** with participant numbers, percentages, bacteria
+   summaries, and p-values
+2. A **paired box plot** showing each person's change over time
+
+### What the bacteria columns mean
+
+| Column | What it measures |
+|--------|-------------------|
+| `qpcr_bacteria` | **Total bacteria** — all bacteria together |
+| `qpcr_crispatus` | ***Lactobacillus crispatus*** — a "good" bacteria linked to vaginal health |
+| `qpcr_iners` | ***Lactobacillus iners*** — another common species, less protective |
+
+```{r load-data}
+# Read the three data files
+samples <- read_csv(here("data/group_a_yogurt/00_sample_ids_yogurt.csv"))
+meta    <- read_csv(here("data/group_a_yogurt/01_participant_metadata_yogurt.csv"))
+qpcr    <- read_csv(here("data/group_a_yogurt/02_qpcr_results_yogurt.csv"))
+
+glimpse(qpcr)
+```
+
+```{r merge-and-tidy}
+# Merge qPCR values with time_point and arm info
+df <- samples %>%
+  left_join(qpcr, by = "sample_id")
+
+# Clean up labels for nice-looking plots
+df <- df %>%
+  mutate(
+    arm = recode(arm,
+                 "unchanged_diet" = "Unchanged diet",
+                 "yogurt"         = "Yogurt"),
+    time_point = recode(time_point,
+                        "baseline"         = "Baseline",
+                        "after_antibiotic" = "After antibiotic"),
+    # Put time points in the right order (baseline first)
+    time_point = fct_relevel(time_point, "Baseline", "After antibiotic")
+  )
+
+# Pivot so each bacteria gets its own row
+df_long <- df %>%
+  pivot_longer(
+    cols      = c(qpcr_bacteria, qpcr_crispatus, qpcr_iners),
+    names_to  = "bacteria",
+    values_to = "value"
+  ) %>%
+  mutate(
+    bacteria = recode(bacteria,
+                      "qpcr_bacteria"  = "Total bacteria",
+                      "qpcr_crispatus" = "L. crispatus",
+                      "qpcr_iners"     = "L. iners"),
+    # Keep the right order
+    bacteria = fct_relevel(bacteria, "Total bacteria", "L. crispatus", "L. iners"),
+    # Flag whether bacteria was detected (value > 0)
+    detected = if_else(value > 0, "Detected", "Not detected")
+  )
+
+# Quick check: does each pid appear at both time points?
+df_long %>%
+  group_by(bacteria, pid) %>%
+  summarise(n_timepoints = n_distinct(time_point), .groups = "drop") %>%
+  count(n_timepoints)
+
+head(df_long)
+```
+
+```{r helper-function}
+# Helper function: compute paired Wilcoxon p-values per arm
+compute_paired_pvals <- function(data) {
+  paired_data <- data %>%
+    select(pid, arm, bacteria, time_point, value) %>%
+    pivot_wider(names_from = time_point, values_from = value)
+
+  paired_data %>%
+    group_by(arm) %>%
+    summarise(
+      p = wilcox.test(Baseline, `After antibiotic`, paired = TRUE, exact = FALSE)$p.value,
+      .groups = "drop"
+    ) %>%
+    mutate(
+      label = paste0("Paired Wilcoxon p = ", formatC(p, format = "e", digits = 2)),
+      x_pos = 2.3
+    )
+}
+```
+
+---
+
+## Overall participant summary
+
+This first table shows how many participants are in each arm, plus the
+total number of participants in the study.
+
+```{r participant-counts}
+# Number of unique participants per arm
+participant_counts <- df_long %>%
+  distinct(pid, arm, bacteria) %>%
+  count(arm, bacteria) %>%
+  mutate(pct = round(n / sum(n) * 100, 1),
+         label = paste0(n, " (", pct, "%)"))
+
+# Overall counts
+overall_counts <- df_long %>%
+  distinct(pid) %>%
+  nrow()
+
+overall_arm_counts <- df_long %>%
+  distinct(pid, arm) %>%
+  count(arm) %>%
+  mutate(pct = round(n / overall_counts * 100, 1),
+         label = paste0(n, " (", pct, "%)"))
+
+# Display
+knitr::kable(
+  overall_arm_counts %>% select(arm, label),
+  col.names = c("Arm", "Participants, n (%)"),
+  caption = paste0("Table 0: Participants per arm (total N = ", overall_counts, ")")
+)
+```
+
+---
+
+## Total bacteria — table + paired plot
+
+### Table: Total bacteria by arm
+
+```{r table-total-bacteria}
+# Widen data so each row is one participant with baseline + after_antibiotic
+total_wide <- df_long %>%
+  filter(bacteria == "Total bacteria") %>%
+  select(pid, arm, time_point, value, detected) %>%
+  pivot_wider(
+    names_from  = time_point,
+    values_from = c(value, detected),
+    names_glue  = "{time_point}_{.value}"
+  )
+
+# Participants with detectable bacteria at each time point
+total_detect <- total_wide %>%
+  group_by(arm) %>%
+  summarise(
+    n_total       = n(),
+    baseline_detected  = sum(Baseline_detected == "Detected"),
+    baseline_pct       = round(baseline_detected / n_total * 100, 0),
+    after_detected     = sum(`After antibiotic_detected` == "Detected"),
+    after_pct          = round(after_detected / n_total * 100, 0),
+    .groups = "drop"
+  ) %>%
+  mutate(
+    baseline_label = paste0(baseline_detected, "/", n_total, " (", baseline_pct, "%)"),
+    after_label    = paste0(after_detected, "/", n_total, " (", after_pct, "%)")
+  )
+
+# Median (IQR) at each time point
+total_summary <- total_wide %>%
+  group_by(arm) %>%
+  summarise(
+    baseline_median_iqr = paste0(
+      format(median(Baseline_value, na.rm = TRUE), big.mark = ",", scientific = FALSE),
+      " (",
+      format(IQR(Baseline_value, na.rm = TRUE), big.mark = ",", scientific = FALSE),
+      ")"
+    ),
+    after_median_iqr = paste0(
+      format(median(`After antibiotic_value`, na.rm = TRUE), big.mark = ",", scientific = FALSE),
+      " (",
+      format(IQR(`After antibiotic_value`, na.rm = TRUE), big.mark = ",", scientific = FALSE),
+      ")"
+    ),
+    .groups = "drop"
+  )
+
+# Paired p-value
+total_pval_arm <- total_wide %>%
+  group_by(arm) %>%
+  summarise(
+    p = wilcox.test(Baseline_value, `After antibiotic_value`, paired = TRUE, exact = FALSE)$p.value,
+    .groups = "drop"
+  ) %>%
+  mutate(p_label = formatC(p, format = "e", digits = 2))
+
+# Combine into one table
+total_table <- total_detect %>%
+  left_join(total_summary, by = "arm") %>%
+  left_join(total_pval_arm, by = "arm") %>%
+  select(
+    arm,
+    n_total,
+    baseline_label,
+    baseline_median_iqr,
+    after_label,
+    after_median_iqr,
+    p_label
+  ) %>%
+  rename(
+    "Arm"                  = arm,
+    "N"                    = n_total,
+    "Baseline detected, n (%)" = baseline_label,
+    "Baseline median (IQR)"    = baseline_median_iqr,
+    "After antibiotic detected, n (%)" = after_label,
+    "After antibiotic median (IQR)"    = after_median_iqr,
+    "Paired p-value"             = p_label
+  )
+
+knitr::kable(total_table, caption = "Table 1: Total bacteria — detection rates and levels by arm")
+```
+
+### Plot: Total bacteria paired change
+
+```{r plot-total-bacteria}
+#| fig-width: 9
+#| fig-height: 5
+
+total_df <- df_long %>% filter(bacteria == "Total bacteria")
+total_pvals <- compute_paired_pvals(total_df)
+
+total_ymax <- total_df %>%
+  group_by(arm) %>%
+  summarise(max_val = max(value, na.rm = TRUE) * 1.15, .groups = "drop")
+
+total_pvals <- total_pvals %>% left_join(total_ymax, by = "arm")
+
+ggplot(total_df, aes(x = time_point, y = value)) +
+  geom_line(aes(group = pid), color = "grey60", alpha = 0.5, linewidth = 0.7) +
+  geom_boxplot(aes(fill = arm), outlier.shape = NA, alpha = 0.4, width = 0.4) +
+  geom_point(aes(color = arm), size = 2.5, alpha = 0.7) +
+  facet_wrap(~ arm) +
+  scale_fill_manual(values = c("Unchanged diet" = "#4A90D9", "Yogurt" = "#E8833A")) +
+  scale_color_manual(values = c("Unchanged diet" = "#4A90D9", "Yogurt" = "#E8833A")) +
+  geom_text(
+    data    = total_pvals,
+    aes(x = x_pos, y = max_val, label = label),
+    inherit.aes = FALSE,
+    hjust = 1, vjust = 1, size = 3.5, color = "grey30"
+  ) +
+  labs(
+    title    = "Total bacteria",
+    subtitle = "Paired change from baseline to after antibiotics",
+    x        = NULL,
+    y        = "Bacterial load (copies/mL)"
+  ) +
+  theme_bw(base_size = 14) +
+  theme(
+    strip.text       = element_text(face = "bold", size = 13),
+    plot.title       = element_text(face = "bold", hjust = 0.5, size = 16),
+    plot.subtitle    = element_text(hjust = 0.5, color = "grey40"),
+    legend.position  = "none"
+  )
+```
+
+**Reading this:** Each grey line is one participant. Sloping **down**
+means their bacteria went down after antibiotics. The p-value tests if
+the overall change is different from zero.
+
+---
+
+## *Lactobacillus crispatus* — table + paired plot
+
+### Table: *L. crispatus* by arm
+
+```{r table-crispatus}
+crispatus_wide <- df_long %>%
+  filter(bacteria == "L. crispatus") %>%
+  select(pid, arm, time_point, value, detected) %>%
+  pivot_wider(
+    names_from  = time_point,
+    values_from = c(value, detected),
+    names_glue  = "{time_point}_{.value}"
+  )
+
+crispatus_detect <- crispatus_wide %>%
+  group_by(arm) %>%
+  summarise(
+    n_total            = n(),
+    baseline_detected  = sum(Baseline_detected == "Detected"),
+    baseline_pct       = round(baseline_detected / n_total * 100, 0),
+    after_detected     = sum(`After antibiotic_detected` == "Detected"),
+    after_pct          = round(after_detected / n_total * 100, 0),
+    .groups = "drop"
+  ) %>%
+  mutate(
+    baseline_label = paste0(baseline_detected, "/", n_total, " (", baseline_pct, "%)"),
+    after_label    = paste0(after_detected, "/", n_total, " (", after_pct, "%)")
+  )
+
+crispatus_summary <- crispatus_wide %>%
+  group_by(arm) %>%
+  summarise(
+    baseline_median_iqr = paste0(
+      format(median(Baseline_value, na.rm = TRUE), big.mark = ",", scientific = FALSE),
+      " (",
+      format(IQR(Baseline_value, na.rm = TRUE), big.mark = ",", scientific = FALSE),
+      ")"
+    ),
+    after_median_iqr = paste0(
+      format(median(`After antibiotic_value`, na.rm = TRUE), big.mark = ",", scientific = FALSE),
+      " (",
+      format(IQR(`After antibiotic_value`, na.rm = TRUE), big.mark = ",", scientific = FALSE),
+      ")"
+    ),
+    .groups = "drop"
+  )
+
+crispatus_pval_arm <- crispatus_wide %>%
+  group_by(arm) %>%
+  summarise(
+    p = wilcox.test(Baseline_value, `After antibiotic_value`, paired = TRUE, exact = FALSE)$p.value,
+    .groups = "drop"
+  ) %>%
+  mutate(p_label = formatC(p, format = "e", digits = 2))
+
+crispatus_table <- crispatus_detect %>%
+  left_join(crispatus_summary, by = "arm") %>%
+  left_join(crispatus_pval_arm, by = "arm") %>%
+  select(arm, n_total, baseline_label, baseline_median_iqr,
+         after_label, after_median_iqr, p_label) %>%
+  rename(
+    "Arm"                               = arm,
+    "N"                                 = n_total,
+    "Baseline detected, n (%)"          = baseline_label,
+    "Baseline median (IQR)"             = baseline_median_iqr,
+    "After antibiotic detected, n (%)"  = after_label,
+    "After antibiotic median (IQR)"     = after_median_iqr,
+    "Paired p-value"                    = p_label
+  )
+
+knitr::kable(crispatus_table,
+             caption = "Table 2: L. crispatus — detection rates and levels by arm")
+```
+
+### Plot: *L. crispatus* paired change
+
+```{r plot-crispatus}
+#| fig-width: 9
+#| fig-height: 5
+
+crispatus_df <- df_long %>% filter(bacteria == "L. crispatus")
+crispatus_pvals <- compute_paired_pvals(crispatus_df)
+
+crispatus_ymax <- crispatus_df %>%
+  group_by(arm) %>%
+  summarise(max_val = max(value, na.rm = TRUE) * 1.15, .groups = "drop")
+
+crispatus_pvals <- crispatus_pvals %>% left_join(crispatus_ymax, by = "arm")
+
+ggplot(crispatus_df, aes(x = time_point, y = value)) +
+  geom_line(aes(group = pid), color = "grey60", alpha = 0.5, linewidth = 0.7) +
+  geom_boxplot(aes(fill = arm), outlier.shape = NA, alpha = 0.4, width = 0.4) +
+  geom_point(aes(color = arm), size = 2.5, alpha = 0.7) +
+  facet_wrap(~ arm) +
+  scale_fill_manual(values = c("Unchanged diet" = "#4A90D9", "Yogurt" = "#E8833A")) +
+  scale_color_manual(values = c("Unchanged diet" = "#4A90D9", "Yogurt" = "#E8833A")) +
+  geom_text(
+    data    = crispatus_pvals,
+    aes(x = x_pos, y = max_val, label = label),
+    inherit.aes = FALSE,
+    hjust = 1, vjust = 1, size = 3.5, color = "grey30"
+  ) +
+  labs(
+    title    = "Lactobacillus crispatus",
+    subtitle = "Paired change from baseline to after antibiotics",
+    x        = NULL,
+    y        = "Bacterial load (copies/mL)"
+  ) +
+  theme_bw(base_size = 14) +
+  theme(
+    strip.text       = element_text(face = "bold", size = 13),
+    plot.title       = element_text(face = "bold", hjust = 0.5, size = 16),
+    plot.subtitle    = element_text(hjust = 0.5, color = "grey40"),
+    legend.position  = "none"
+  )
+```
+
+---
+
+## *Lactobacillus iners* — table + paired plot
+
+### Table: *L. iners* by arm
+
+```{r table-iners}
+iners_wide <- df_long %>%
+  filter(bacteria == "L. iners") %>%
+  select(pid, arm, time_point, value, detected) %>%
+  pivot_wider(
+    names_from  = time_point,
+    values_from = c(value, detected),
+    names_glue  = "{time_point}_{.value}"
+  )
+
+iners_detect <- iners_wide %>%
+  group_by(arm) %>%
+  summarise(
+    n_total            = n(),
+    baseline_detected  = sum(Baseline_detected == "Detected"),
+    baseline_pct       = round(baseline_detected / n_total * 100, 0),
+    after_detected     = sum(`After antibiotic_detected` == "Detected"),
+    after_pct          = round(after_detected / n_total * 100, 0),
+    .groups = "drop"
+  ) %>%
+  mutate(
+    baseline_label = paste0(baseline_detected, "/", n_total, " (", baseline_pct, "%)"),
+    after_label    = paste0(after_detected, "/", n_total, " (", after_pct, "%)")
+  )
+
+iners_summary <- iners_wide %>%
+  group_by(arm) %>%
+  summarise(
+    baseline_median_iqr = paste0(
+      format(median(Baseline_value, na.rm = TRUE), big.mark = ",", scientific = FALSE),
+      " (",
+      format(IQR(Baseline_value, na.rm = TRUE), big.mark = ",", scientific = FALSE),
+      ")"
+    ),
+    after_median_iqr = paste0(
+      format(median(`After antibiotic_value`, na.rm = TRUE), big.mark = ",", scientific = FALSE),
+      " (",
+      format(IQR(`After antibiotic_value`, na.rm = TRUE), big.mark = ",", scientific = FALSE),
+      ")"
+    ),
+    .groups = "drop"
+  )
+
+iners_pval_arm <- iners_wide %>%
+  group_by(arm) %>%
+  summarise(
+    p = wilcox.test(Baseline_value, `After antibiotic_value`, paired = TRUE, exact = FALSE)$p.value,
+    .groups = "drop"
+  ) %>%
+  mutate(p_label = formatC(p, format = "e", digits = 2))
+
+iners_table <- iners_detect %>%
+  left_join(iners_summary, by = "arm") %>%
+  left_join(iners_pval_arm, by = "arm") %>%
+  select(arm, n_total, baseline_label, baseline_median_iqr,
+         after_label, after_median_iqr, p_label) %>%
+  rename(
+    "Arm"                               = arm,
+    "N"                                 = n_total,
+    "Baseline detected, n (%)"          = baseline_label,
+    "Baseline median (IQR)"             = baseline_median_iqr,
+    "After antibiotic detected, n (%)"  = after_label,
+    "After antibiotic median (IQR)"     = after_median_iqr,
+    "Paired p-value"                    = p_label
+  )
+
+knitr::kable(iners_table,
+             caption = "Table 3: L. iners — detection rates and levels by arm")
+```
+
+### Plot: *L. iners* paired change
+
+```{r plot-iners}
+#| fig-width: 9
+#| fig-height: 5
+
+iners_df <- df_long %>% filter(bacteria == "L. iners")
+iners_pvals <- compute_paired_pvals(iners_df)
+
+iners_ymax <- iners_df %>%
+  group_by(arm) %>%
+  summarise(max_val = max(value, na.rm = TRUE) * 1.15, .groups = "drop")
+
+iners_pvals <- iners_pvals %>% left_join(iners_ymax, by = "arm")
+
+ggplot(iners_df, aes(x = time_point, y = value)) +
+  geom_line(aes(group = pid), color = "grey60", alpha = 0.5, linewidth = 0.7) +
+  geom_boxplot(aes(fill = arm), outlier.shape = NA, alpha = 0.4, width = 0.4) +
+  geom_point(aes(color = arm), size = 2.5, alpha = 0.7) +
+  facet_wrap(~ arm) +
+  scale_fill_manual(values = c("Unchanged diet" = "#4A90D9", "Yogurt" = "#E8833A")) +
+  scale_color_manual(values = c("Unchanged diet" = "#4A90D9", "Yogurt" = "#E8833A")) +
+  geom_text(
+    data    = iners_pvals,
+    aes(x = x_pos, y = max_val, label = label),
+    inherit.aes = FALSE,
+    hjust = 1, vjust = 1, size = 3.5, color = "grey30"
+  ) +
+  labs(
+    title    = "Lactobacillus iners",
+    subtitle = "Paired change from baseline to after antibiotics",
+    x        = NULL,
+    y        = "Bacterial load (copies/mL)"
+  ) +
+  theme_bw(base_size = 14) +
+  theme(
+    strip.text       = element_text(face = "bold", size = 13),
+    plot.title       = element_text(face = "bold", hjust = 0.5, size = 16),
+    plot.subtitle    = element_text(hjust = 0.5, color = "grey40"),
+    legend.position  = "none"
+  )
+```
+
+---
+
+## Master summary: All bacteria combined
+
+```{r master-table}
+# Build one big table for all bacteria
+build_bacteria_table <- function(bacteria_name) {
+  wide <- df_long %>%
+    filter(bacteria == bacteria_name) %>%
+    select(pid, arm, time_point, value, detected) %>%
+    pivot_wider(
+      names_from  = time_point,
+      values_from = c(value, detected),
+      names_glue  = "{time_point}_{.value}"
+    )
+
+  detect <- wide %>%
+    group_by(arm) %>%
+    summarise(
+      n_total            = n(),
+      baseline_detected  = sum(Baseline_detected == "Detected"),
+      baseline_pct       = round(baseline_detected / n_total * 100, 0),
+      after_detected     = sum(`After antibiotic_detected` == "Detected"),
+      after_pct          = round(after_detected / n_total * 100, 0),
+      .groups = "drop"
+    ) %>%
+    mutate(
+      baseline_lbl = paste0(baseline_detected, "/", n_total, " (", baseline_pct, "%)"),
+      after_lbl    = paste0(after_detected, "/", n_total, " (", after_pct, "%)")
+    )
+
+  summary <- wide %>%
+    group_by(arm) %>%
+    summarise(
+      bl_med_iqr = paste0(
+        format(median(Baseline_value, na.rm = TRUE), big.mark = ",", scientific = FALSE),
+        " (",
+        format(IQR(Baseline_value, na.rm = TRUE), big.mark = ",", scientific = FALSE),
+        ")"
+      ),
+      aft_med_iqr = paste0(
+        format(median(`After antibiotic_value`, na.rm = TRUE), big.mark = ",", scientific = FALSE),
+        " (",
+        format(IQR(`After antibiotic_value`, na.rm = TRUE), big.mark = ",", scientific = FALSE),
+        ")"
+      ),
+      .groups = "drop"
+    )
+
+  pval <- wide %>%
+    group_by(arm) %>%
+    summarise(
+      p = wilcox.test(Baseline_value, `After antibiotic_value`, paired = TRUE, exact = FALSE)$p.value,
+      .groups = "drop"
+    ) %>%
+    mutate(p_lbl = formatC(p, format = "e", digits = 2))
+
+  detect %>%
+    left_join(summary, by = "arm") %>%
+    left_join(pval, by = "arm") %>%
+    mutate(bacteria = bacteria_name, .before = 1)
+}
+
+master <- bind_rows(
+  build_bacteria_table("Total bacteria"),
+  build_bacteria_table("L. crispatus"),
+  build_bacteria_table("L. iners")
+) %>%
+  select(
+    Bacteria = bacteria,
+    Arm = arm,
+    N = n_total,
+    "Baseline detected, n (%)" = baseline_lbl,
+    "Baseline median (IQR)" = bl_med_iqr,
+    "After antibiotic detected, n (%)" = after_lbl,
+    "After antibiotic median (IQR)" = aft_med_iqr,
+    "Paired p-value" = p_lbl
+  )
+
+knitr::kable(master, caption = "Table 4: Complete summary — all bacteria, detection rates, levels, and paired p-values")
+```
+
+## Bonus: All three bacteria in one figure
+
+```{r plot-all-bacteria}
+#| fig-width: 10
+#| fig-height: 8
+
+# Compute all paired p-values at once using the wider format
+all_paired <- df_long %>%
+  select(pid, arm, bacteria, time_point, value) %>%
+  pivot_wider(names_from = time_point, values_from = value)
+
+all_pvals <- all_paired %>%
+  group_by(bacteria, arm) %>%
+  summarise(
+    p = wilcox.test(Baseline, `After antibiotic`, paired = TRUE, exact = FALSE)$p.value,
+    .groups = "drop"
+  ) %>%
+  mutate(label = paste0("p = ", formatC(p, format = "e", digits = 2)))
+
+all_ymax <- df_long %>%
+  group_by(bacteria, arm) %>%
+  summarise(max_val = max(value, na.rm = TRUE) * 1.15, .groups = "drop")
+
+all_pvals <- all_pvals %>% left_join(all_ymax, by = c("bacteria", "arm"))
+
+ggplot(df_long, aes(x = time_point, y = value)) +
+  geom_line(aes(group = pid), color = "grey60", alpha = 0.3, linewidth = 0.5) +
+  geom_boxplot(aes(fill = arm), outlier.shape = NA, alpha = 0.4, width = 0.4) +
+  geom_point(aes(color = arm), size = 1.8, alpha = 0.6) +
+  facet_grid(bacteria ~ arm, scales = "free_y") +
+  scale_fill_manual(values = c("Unchanged diet" = "#4A90D9", "Yogurt" = "#E8833A")) +
+  scale_color_manual(values = c("Unchanged diet" = "#4A90D9", "Yogurt" = "#E8833A")) +
+  geom_text(
+    data    = all_pvals,
+    aes(x = 2.3, y = max_val, label = label),
+    inherit.aes = FALSE,
+    hjust = 1, vjust = 1, size = 3.2, color = "grey30"
+  ) +
+  labs(
+    title    = "qPCR Bacteria — Paired Change Over Time",
+    subtitle = "How each participant's bacteria changed from baseline to after antibiotic, by arm",
+    x        = NULL,
+    y        = "Bacterial load (copies/mL)"
+  ) +
+  theme_bw(base_size = 13) +
+  theme(
+    strip.text       = element_text(face = "bold", size = 11),
+    plot.title       = element_text(face = "bold", hjust = 0.5, size = 15),
+    plot.subtitle    = element_text(hjust = 0.5, color = "grey40"),
+    legend.position  = "bottom"
+  )
+```
+
+---
+
+## How to re-run this tomorrow
+
+Open this file in RStudio and click the **Render** button (or
+`Ctrl`/`Cmd` + `Shift` + `K`). Quarto will run all the code and create
+an HTML file with the tables and plots.

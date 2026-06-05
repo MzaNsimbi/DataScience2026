@@ -1,0 +1,158 @@
+---
+title: "Module 6 — Table 1 (Yogurt Group)"
+format: html
+editor: source
+execute:
+  warning: false
+  message: false
+---
+
+> *Your mode for this exercise.* Group A: **agentic** — describe each step to Pi
+> and let it write the code. Group B: **manual** — write each step yourself.
+
+```{r setup}
+library(tidyverse)
+library(here)
+library(gtsummary)
+
+metadata <- read_csv(
+  here("data/group_a_yogurt/01_participant_metadata_yogurt.csv"),
+  col_types = cols(sex = col_character())
+)
+```
+
+---
+
+## The data
+
+```{r}
+metadata
+```
+
+Your columns:
+
+| Column | Type | What it is |
+|---|---|---|
+| `pid` | ID | Participant identifier (not a variable) |
+| `arm` | **Group** | `yogurt` or `unchanged_diet` |
+| `age` | Continuous | Years |
+| `education` | Categorical | 4 levels: less than grade 9 / grade 10-12... |
+| `birth_control` | Categorical | Depoprovera or no hormonal birth control |
+| `days_since_last_sex` | Continuous | Days |
+| `sex` | Constant | All female (skip this one) |
+
+---
+
+## Step 1 — Default `tbl_summary`
+
+Start here. We drop `pid` and `sex` (sex is constant, pid is an ID):
+
+```{r}
+# step 1: tbl_summary defaults
+metadata |>
+  select(-pid, -sex) |>
+  tbl_summary(by = arm)
+```
+
+**What to notice:** gtsummary automatically picks the right summary for each
+variable type — median (IQR) for continuous, n (%) for categorical. It also
+automatically picks the right test for `add_p()` (more on that below).
+
+---
+
+## Step 2 — Add p-values
+
+Add `|> add_p()` to the chain:
+
+```{r}
+# step 2: add p-values
+metadata |>
+  select(-pid, -sex) |>
+  tbl_summary(by = arm) |>
+  add_p()
+```
+
+**What the p-values mean here:** These tests check whether the *baseline*
+characteristics differ between the two arms. In a randomised study, we expect
+most to be non-significant (p > 0.05), because randomisation should balance the
+groups. A significant p-value would be a red flag — it might mean randomisation
+didn't work perfectly, or the difference is just bad luck (that's why we
+usually don't "adjust" for these, we just report them).
+
+**Which test does `add_p()` pick?** It depends on the variable type:
+- *Continuous* (`age`, `days_since_last_sex`): **Wilcoxon rank-sum test**
+  (Mann-Whitney U) — a non-parametric test that doesn't assume normality.
+- *Categorical* (`education`, `birth_control`, `arm`): **Fisher's exact test**
+  (when any expected count < 5) or **chi-squared test**.
+
+---
+
+## Step 3 — Override `age` to mean (SD) + t-test
+
+Sometimes people prefer mean ± SD for age (it's conventional in many fields).
+You can override both the summary statistic and the test:
+
+```{r}
+# step 3: override age to mean (SD) + t-test
+metadata |>
+  select(-pid, -sex) |>
+  tbl_summary(
+    by = arm,
+    statistic = list(age ~ "{mean} ({sd})")
+  ) |>
+  add_p(
+    test = list(age ~ "t.test")
+  )
+```
+
+`statistic` controls how each variable is displayed. `test` controls which
+hypothesis test `add_p()` runs. You can mix and match — maybe you want
+median (IQR) for `days_since_last_sex` but mean (SD) for `age`.
+
+---
+
+## Step 4 — Polish
+
+Final touches: add an overall column, bold the labels, clean up the header:
+
+```{r}
+# step 4: polished table
+metadata |>
+  select(-pid, -sex) |>
+  tbl_summary(
+    by = arm,
+    statistic = list(age ~ "{mean} ({sd})")
+  ) |>
+  add_p(
+    test = list(age ~ "t.test")
+  ) |>
+  add_overall() |>
+  bold_labels() |>
+  modify_header(label ~ "**Characteristic**")
+```
+
+---
+
+## Step 5 — Your interpretation
+
+Now look at the p-values in your final table and answer:
+
+1. **Age** — Are the yogurt and unchanged-diet groups similar in age? What's the p-value?
+2. **Education** — Does one group have more participants with post-secondary education?
+3. **Birth control** — Is Depoprovera use balanced between arms?
+4. **Days since last sex** — Any imbalance here? (This one is sometimes not perfectly balanced even in randomised trials.)
+
+If all p-values are > 0.05, the randomisation did its job — the groups look
+comparable at baseline. Any differences you see *after* the intervention can
+more confidently be attributed to the yogurt, not to pre-existing differences.
+
+---
+
+## Reach (optional)
+
+Try building Table 1 with `by = education` instead of `by = arm`. What question
+does *that* table answer?
+
+```{r}
+# reach: by = education
+```

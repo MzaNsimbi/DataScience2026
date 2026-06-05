@@ -1,0 +1,18 @@
+
+
+
+I want to simulate a dataset with CD3 on the y-axis and the following regression formula,
+
+y ~ ns(time) + (1 | pair_id) + male
+
+time is an integer from 1 to 10
+imagine there are 10 pairs
+we assume the pairs include male/female difference, and that the male effect is consistent across all timepoints and pairs
+
+Please save the data to data/simulation and generate a plot showing example trajectories with the gap between pairs.
+
+Great. Now let's generate a very related dataset (not overwriting previous data) that includes a growing gap between trajectories over time. I imagine this having the formula 
+
+y ~ (1 | pair_id) + ns(time) * male
+
+But if this is not clear/reasonable please ask clarifying questions. As before, save the data to a CSV and include a figure.

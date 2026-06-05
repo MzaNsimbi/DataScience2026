@@ -1,0 +1,189 @@
+---
+title: "Group A — Yogurt Study Data Dictionary"
+subtitle: "Exploring the yogurt dataset: sample IDs, participant metadata, qPCR, and Luminex"
+author: "Group A"
+format:
+  html:
+    toc: true
+    code-fold: true
+    embed-resources: true
+---
+
+## Overview
+
+This document describes every CSV file in `data/group_a_yogurt/`.  
+Each section shows what a **single row** represents, then explains every column.
+
+The study is about the effect of **yogurt consumption** (vs. unchanged diet) on
+the vaginal microbiome and immune environment, measured before and after a
+course of antibiotics.
+
+```{r setup, message=FALSE}
+library(tidyverse)
+```
+
+---
+
+## 00 — Sample IDs {#sec-sample-ids}
+
+**File:** `00_sample_ids_yogurt.csv`
+
+**One row represents:** one biological sample collected from one participant at
+one time point. A single participant (`pid`) can appear twice (baseline and
+after antibiotics).
+
+```{r read-sample-ids}
+sample_ids <- read_csv("../data/group_a_yogurt/00_sample_ids_yogurt.csv")
+glimpse(sample_ids)
+```
+
+### Columns
+
+| Column | Type | What it means |
+|--------|------|---------------|
+| `pid` | character | **Participant ID** — a unique code for each person in the study (e.g. `pid_25`). Links to the metadata file. |
+| `time_point` | character | When the sample was taken: `"baseline"` (before antibiotics) or `"after_antibiotic"`. |
+| `arm` | character | Which study group the participant was in: `"yogurt"` (ate yogurt during the study) or `"unchanged_diet"` (control group, no change to diet). |
+| `sample_id` | character | **Lab sample ID** — a unique identifier for the physical sample that was sent to the lab. Starts with `UNCH` (unchanged diet) or `YOG` (yogurt). Used to link with qPCR and Luminex results. |
+
+```{r peek-sample-ids}
+# Quick peek: how many participants, samples per time point
+sample_ids |> count(time_point, arm)
+```
+
+---
+
+## 01 — Participant Metadata {#sec-metadata}
+
+**File:** `01_participant_metadata_yogurt.csv`
+
+**One row represents:** one participant enrolled in the study.
+
+```{r read-metadata}
+metadata <- read_csv("../data/group_a_yogurt/01_participant_metadata_yogurt.csv")
+glimpse(metadata)
+```
+
+### Columns
+
+| Column | Type | What it means |
+|--------|------|---------------|
+| `pid` | character | **Participant ID** — same code as in the sample IDs file. One row per person. |
+| `arm` | character | Study arm: `"yogurt"` or `"unchanged_diet"` (control). |
+| `days_since_last_sex` | integer | **Number of days** since the participant last had sex at the time of enrollment. |
+| `birth_control` | character | Type of birth control used: `"no hormonal birth control"` or `"Depoprovera"` (an injectable hormonal contraceptive). |
+| `age` | integer | Participant's age in years. |
+| `education` | character | Highest education level: `"less than grade 9"`, `"grade 10-12, not matriculated"`, `"grade 10-12, matriculated"`, or `"post-secondary"`. |
+| `sex` | character | Sex assigned at birth (all `"female"` in this study). |
+
+```{r peek-metadata}
+# Quick peek: age range and birth control distribution
+metadata |>
+  summarise(
+    n = n(),
+    min_age = min(age),
+    max_age = max(age),
+    mean_age = mean(age)
+  )
+
+metadata |> count(arm, birth_control)
+```
+
+---
+
+## 02 — qPCR Results {#sec-qpcr}
+
+**File:** `02_qpcr_results_yogurt.csv`
+
+**One row represents:** the abundance (by qPCR) of three bacterial targets in
+one vaginal sample.
+
+qPCR (quantitative polymerase chain reaction) is a lab technique that measures
+how much DNA of a specific bacterium is present. Higher numbers = more of that
+bacterium.
+
+```{r read-qpcr}
+qpcr <- read_csv("../data/group_a_yogurt/02_qpcr_results_yogurt.csv")
+glimpse(qpcr)
+```
+
+### Columns
+
+| Column | Type | What it means |
+|--------|------|---------------|
+| `sample_id` | character | **Sample ID** — links to the sample IDs file (00). |
+| `qpcr_bacteria` | double | **Total bacterial load** — total amount of bacterial DNA in the sample (higher = more bacteria overall). |
+| `qpcr_crispatus` | double | Amount of *Lactobacillus crispatus* DNA. This is a "good" bacterium linked to a healthy vaginal microbiome. |
+| `qpcr_iners` | double | Amount of *Lactobacillus iners* DNA. This species is less protective than *L. crispatus* and is often found in less stable microbiomes. |
+
+```{r peek-qpcr}
+# How many samples have detectable crispatus vs iners?
+qpcr |>
+  summarise(
+    n_samples = n(),
+    crispatus_detectable = sum(qpcr_crispatus > 0),
+    iners_detectable = sum(qpcr_iners > 0)
+  )
+```
+
+---
+
+## 03 — Luminex Results {#sec-luminex}
+
+**File:** `03_luminex_results_yogurt.csv`
+
+**One row represents:** the concentration of one **cytokine** (immune protein)
+measured in one vaginal sample. So each sample has multiple rows — one per
+cytokine tested.
+
+Luminex is a multiplex assay: it measures many different immune proteins in the
+same liquid sample at once.
+
+```{r read-luminex}
+luminex <- read_csv("../data/group_a_yogurt/03_luminex_results_yogurt.csv")
+glimpse(luminex)
+```
+
+### Columns
+
+| Column | Type | What it means |
+|--------|------|---------------|
+| `sample_id` | character | **Sample ID** — links to the sample IDs file (00). |
+| `cytokine` | character | Which immune protein was measured. Options: `IL-1a`, `IL-1b`, `IL-6`, `IL-8`, `IL-10`, `TNFa`, `IP-10`, `MIG`, `IFN-Y`, `MIP-3a`. These are signalling molecules the immune system uses to communicate. |
+| `conc` | double | **Concentration** of that cytokine in the sample (units are pg/mL — picograms per millilitre). |
+| `limits` | character | Whether the measured concentration was within the reliable detection range of the assay: `"within limits"` or `"out of range"` (too low or too high to be measured accurately). |
+
+```{r peek-luminex}
+# How many measurements per cytokine?
+luminex |> count(cytokine)
+
+# Which cytokines often go out of range?
+luminex |>
+  count(cytokine, limits) |>
+  arrange(desc(n))
+```
+
+---
+
+## Putting It All Together
+
+These four files can be joined through the `sample_id` and `pid` columns:
+
+1. **01 → 00:** join by `pid` to add participant background to each sample
+2. **00 → 02:** join by `sample_id` to add bacterial abundance data
+3. **00 → 03:** join by `sample_id` to add immune protein data
+
+This lets you ask questions like:  
+> "Does yogurt consumption change the levels of *L. crispatus* or inflammatory cytokines after antibiotics?"
+
+```{r join-demo, message=FALSE}
+# Example: combine everything into one wide dataset
+samples_with_metadata <- sample_ids |>
+  left_join(metadata, by = "pid")
+
+# A glimpse at the joined data
+samples_with_metadata |>
+  select(pid, time_point, arm.x, age, birth_control) |>
+  distinct() |>
+  head(8)
+```

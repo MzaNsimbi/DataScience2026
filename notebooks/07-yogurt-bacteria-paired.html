@@ -1,0 +1,1635 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Group A Yogurt Study — Paired Bacteria Analysis</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="07-yogurt-bacteria-paired_files/libs/clipboard/clipboard.min.js"></script>
+<script src="07-yogurt-bacteria-paired_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="07-yogurt-bacteria-paired_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="07-yogurt-bacteria-paired_files/libs/quarto-html/popper.min.js"></script>
+<script src="07-yogurt-bacteria-paired_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="07-yogurt-bacteria-paired_files/libs/quarto-html/anchor.min.js"></script>
+<link href="07-yogurt-bacteria-paired_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="07-yogurt-bacteria-paired_files/libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="07-yogurt-bacteria-paired_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="07-yogurt-bacteria-paired_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="07-yogurt-bacteria-paired_files/libs/bootstrap/bootstrap-de9ea4695b5809f5b49b6072e50bb385.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="fullcontent quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Group A Yogurt Study — Paired Bacteria Analysis</h1>
+<p class="subtitle lead">How bacteria levels changed from baseline to after antibiotics, by arm</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<hr>
+<section id="study-notes-read-this-first" class="level2">
+<h2 class="anchored" data-anchor-id="study-notes-read-this-first">Study Notes (read this first!)</h2>
+<section id="aim-of-the-study" class="level3">
+<h3 class="anchored" data-anchor-id="aim-of-the-study">Aim of the study</h3>
+<p>The main goal of this study was to find out whether <strong>eating yoghurt</strong> helps protect the vaginal microbes (bacteria) when a person takes antibiotics. Antibiotics can kill both the bad bacteria causing an infection AND the good bacteria that keep the vagina healthy, which can lead to problems like yeast infections or bacterial vaginosis. The idea is that yoghurt (which contains good bacteria like <em>Lactobacillus</em>) might help restore or protect the vaginal microbiome.</p>
+</section>
+<section id="objectives" class="level3">
+<h3 class="anchored" data-anchor-id="objectives">Objectives</h3>
+<ol type="1">
+<li>Measure the levels of key vaginal bacteria at <strong>baseline</strong> (before any antibiotics) and <strong>after taking antibiotics</strong></li>
+<li>Compare what happens in two groups of participants:
+<ul>
+<li><strong>Unchanged diet</strong> — people who went about their normal diet</li>
+<li><strong>Yoghurt</strong> — people who ate yoghurt during the study</li>
+</ul></li>
+<li>See if the yoghurt group had better preservation of “good” bacteria (<em>L. crispatus</em>) compared to the unchanged diet group</li>
+<li>Use statistical tests (p-values) to decide if any differences we see are real or just by chance</li>
+</ol>
+</section>
+<section id="how-the-study-was-conducted" class="level3">
+<h3 class="anchored" data-anchor-id="how-the-study-was-conducted">How the study was conducted</h3>
+<p>Here’s a simple walkthrough of the study design:</p>
+<pre><code>Step 1: Recruit participants (total N = 51 women)
+                |
+Step 2: Divide into two arms
+        ├── Unchanged diet (~25 women) — eat as usual
+        └── Yoghurt (~26 women) — eat yoghurt daily
+                |
+Step 3: Take baseline sample (swab) → measure bacteria
+                |
+Step 4: Everyone takes antibiotics (for an infection)
+                |
+Step 5: Take after-antibiotic sample → measure bacteria again
+                |
+Step 6: Compare: Did bacteria change? Did yoghurt help?</code></pre>
+<p><strong>Key idea — “Paired” design:</strong> Each woman is measured twice (before and after antibiotics). This is powerful because each person acts as her <strong>own control</strong>. We’re not comparing different people — we’re comparing each person to herself before and after. This removes a lot of natural differences between people (everyone’s microbiome is a bit different).</p>
+</section>
+<section id="what-we-measured-the-bacteria" class="level3">
+<h3 class="anchored" data-anchor-id="what-we-measured-the-bacteria">What we measured (the bacteria)</h3>
+<p>The researchers used a technique called <strong>qPCR</strong> (quantitative PCR) to count how many copies of bacterial DNA were in each sample. Think of it like a microscope that can count individual bacteria. They looked at:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 34%">
+<col style="width: 31%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Bacteria column</th>
+<th>What it means</th>
+<th>Why it matters</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>qpcr_bacteria</code></td>
+<td><strong>Total bacteria</strong> — all bacteria combined</td>
+<td>Gives us a sense of the overall bacterial community</td>
+</tr>
+<tr class="even">
+<td><code>qpcr_crispatus</code></td>
+<td><strong><em>Lactobacillus crispatus</em></strong> — a “good” bacteria</td>
+<td>This species produces hydrogen peroxide which kills bad bacteria. High levels = healthy vaginal environment</td>
+</tr>
+<tr class="odd">
+<td><code>qpcr_iners</code></td>
+<td><strong><em>Lactobacillus iners</em></strong> — another <em>Lactobacillus</em> species</td>
+<td>Less protective than <em>crispatus</em>. Can switch between helpful and harmful depending on conditions</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="how-we-made-the-graphs-explained-simply" class="level3">
+<h3 class="anchored" data-anchor-id="how-we-made-the-graphs-explained-simply">How we made the graphs (explained simply)</h3>
+<p><strong>Step 1 — Gather the data:</strong> We read three CSV files — one with the participant IDs and which group they were in, one with the time point (baseline vs after antibiotic), and one with the qPCR bacteria counts. We merged them together so every row has: <em>who</em> the person is + <em>when</em> the sample was taken + <em>which group</em> they belong to + <em>how much</em> bacteria was found.</p>
+<p><strong>Step 2 — Organise the data:</strong> We reshaped the data so each bacteria (Total, <em>L. crispatus</em>, <em>L. iners</em>) becomes its own row. This makes it easier to create one graph per bacteria.</p>
+<p><strong>Step 3 — Create the plots:</strong> For each bacteria, we drew: - <strong>Grey lines</strong> connecting each person’s two measurements (baseline → after antibiotic). Each line is one woman. If the line goes down, her bacteria decreased. If it goes up, it increased. - <strong>Box plots</strong> showing the overall pattern for the group. The box shows the middle 50% of values, the line inside is the median (middle value), and the “whiskers” show the range. - <strong>Dots</strong> for each individual measurement, coloured by arm. - <strong>P-values</strong> calculated using a paired Wilcoxon test. This is a statistical test that asks: “Is the change from before to after antibiotics big enough that we can be confident it’s not just random noise?”</p>
+<p><strong>Step 4 — Build the tables:</strong> For each bacteria and each arm, we counted how many participants had detectable levels (n, %), calculated the median (middle value) and IQR (spread), and added the p-value.</p>
+</section>
+<section id="understanding-p-values-simple-explanation" class="level3">
+<h3 class="anchored" data-anchor-id="understanding-p-values-simple-explanation">Understanding p-values (simple explanation)</h3>
+<p>A p-value tells you the probability that what you’re seeing happened by random chance alone.</p>
+<ul>
+<li><strong>p &lt; 0.05</strong> — less than 5% chance it’s random. We call this “statistically significant”. The difference is probably real.</li>
+<li><strong>p &lt; 0.01</strong> — less than 1% chance. Strong evidence of a real difference.</li>
+<li><strong>p &lt; 0.001</strong> — less than 0.1% chance. Very strong evidence.</li>
+<li><strong>p &gt; 0.05</strong> — not statistically significant. The difference could easily be due to random chance. We can’t confidently say there’s a real difference.</li>
+</ul>
+<p>Note: A high p-value doesn’t mean “no difference”. It means “we don’t have enough evidence to say there IS a difference”. With only ~25 people per group, sometimes real differences are missed because the sample is too small.</p>
+</section>
+<section id="advantages-of-this-study-design" class="level3">
+<h3 class="anchored" data-anchor-id="advantages-of-this-study-design">Advantages of this study design</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 42%">
+<col style="width: 57%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Advantage</th>
+<th>Why it’s good</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Paired design</strong></td>
+<td>Each person is their own control. This removes the natural variation between different people, making it easier to spot real changes</td>
+</tr>
+<tr class="even">
+<td><strong>Two time points</strong></td>
+<td>We see the <em>change</em> over time, not just a snapshot. This tells us about the effect of antibiotics + yoghurt</td>
+</tr>
+<tr class="odd">
+<td><strong>qPCR measurement</strong></td>
+<td>qPCR is very precise — it can detect tiny amounts of bacterial DNA, giving accurate counts</td>
+</tr>
+<tr class="even">
+<td><strong>Wilcoxon test</strong></td>
+<td>This test doesn’t assume the data follows a bell curve (normal distribution). Our data has many zeros and is very skewed, so this is the right choice</td>
+</tr>
+<tr class="odd">
+<td><strong>Detection rates</strong></td>
+<td>We show both how many people have the bacteria AND how much. This gives a complete picture</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="disadvantages-and-limitations" class="level3">
+<h3 class="anchored" data-anchor-id="disadvantages-and-limitations">Disadvantages and limitations</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 42%">
+<col style="width: 57%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Limitation</th>
+<th>Why it matters</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Small sample size</strong></td>
+<td>About 25 people per arm. With small groups, it’s harder to detect real differences (low “statistical power”)</td>
+</tr>
+<tr class="even">
+<td><strong>No randomisation info</strong></td>
+<td>We don’t know how people were assigned to yoghurt vs unchanged diet. If it wasn’t random, the groups might be different in ways that affect the results</td>
+</tr>
+<tr class="odd">
+<td><strong>Short follow-up</strong></td>
+<td>Only one time point after antibiotics. We don’t know if changes lasted or if people recovered</td>
+</tr>
+<tr class="even">
+<td><strong>No placebo</strong></td>
+<td>People knew whether they were eating yoghurt or not. This could affect behaviour (placebo effect)</td>
+</tr>
+<tr class="odd">
+<td><strong>Many zeros</strong></td>
+<td><em>L. crispatus</em> especially has many zero values (not detected). This makes statistical analysis harder and means median values are often 0</td>
+</tr>
+<tr class="even">
+<td><strong>Single measurement method</strong></td>
+<td>Only qPCR was used. Other methods (like 16S sequencing) might give a broader picture of all bacteria present</td>
+</tr>
+<tr class="odd">
+<td><strong>Confounding factors</strong></td>
+<td>Things like age, birth control, sexual activity, and diet outside yoghurt could influence the results. We haven’t adjusted for these in these simple plots</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="summary-and-key-takeaways" class="level3">
+<h3 class="anchored" data-anchor-id="summary-and-key-takeaways">Summary and key takeaways</h3>
+<p>Based on the graphs and tables in this document:</p>
+<ol type="1">
+<li><p><strong>Total bacteria</strong> — After antibiotics, total bacteria levels tend to decrease in both groups. The p-values will tell us if the decrease is significant and whether the yoghurt group fared better.</p></li>
+<li><p><strong><em>L. crispatus</em></strong> — This is the key “good” bacteria we care about. Antibiotics often wipe it out. If yoghurt helps, we might see <em>crispatus</em> levels dropping less (or recovering more) in the yoghurt group. However, many participants start with zero, which makes it hard to show protection.</p></li>
+<li><p><strong><em>L. iners</em></strong> — This species is more mixed in its effects. It might increase after antibiotics as it fills the space left by other bacteria. The yoghurt group might show different patterns.</p></li>
+<li><p><strong>Overall</strong> — The paired plots (grey lines connecting before → after) are the most informative: they show individual trajectories. Look for patterns where most lines go in one direction (all down or all up) — that’s a strong signal. If lines go every which way, there’s no clear effect.</p></li>
+</ol>
+<p><strong>What to look for in each graph:</strong> - Do most grey lines go down? → Bacteria decreased after antibiotics - Is the decrease smaller in the yoghurt group? → Yoghurt might help - Is the p-value &lt; 0.05? → The change is statistically significant - Are the detection rates similar at both time points? → Bacteria were preserved</p>
+</section>
+<section id="why-this-matters" class="level3">
+<h3 class="anchored" data-anchor-id="why-this-matters">Why this matters</h3>
+<p>Vaginal health is important for preventing infections, especially in women. If something as simple as eating yoghurt can protect the vaginal microbiome during antibiotic treatment, it could be an easy, low-cost recommendation for doctors to give their patients. This study is a step toward understanding that question.</p>
+<hr>
+</section>
+</section>
+<section id="about-this-file" class="level2">
+<h2 class="anchored" data-anchor-id="about-this-file">About this file</h2>
+<p>This document shows how bacteria changed from <strong>baseline</strong> to <strong>after antibiotic</strong> for each participant, split by diet arm (<strong>unchanged diet</strong> vs <strong>yogurt</strong>). Each section has:</p>
+<ol type="1">
+<li>A <strong>table</strong> with participant numbers, percentages, bacteria summaries, and p-values</li>
+<li>A <strong>paired box plot</strong> showing each person’s change over time</li>
+</ol>
+<section id="what-the-bacteria-columns-mean" class="level3">
+<h3 class="anchored" data-anchor-id="what-the-bacteria-columns-mean">What the bacteria columns mean</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 29%">
+<col style="width: 70%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Column</th>
+<th>What it measures</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>qpcr_bacteria</code></td>
+<td><strong>Total bacteria</strong> — all bacteria together</td>
+</tr>
+<tr class="even">
+<td><code>qpcr_crispatus</code></td>
+<td><strong><em>Lactobacillus crispatus</em></strong> — a “good” bacteria linked to vaginal health</td>
+</tr>
+<tr class="odd">
+<td><code>qpcr_iners</code></td>
+<td><strong><em>Lactobacillus iners</em></strong> — another common species, less protective</td>
+</tr>
+</tbody>
+</table>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Read the three data files</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>samples <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="fu">here</span>(<span class="st">"data/group_a_yogurt/00_sample_ids_yogurt.csv"</span>))</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>meta    <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="fu">here</span>(<span class="st">"data/group_a_yogurt/01_participant_metadata_yogurt.csv"</span>))</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>qpcr    <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="fu">here</span>(<span class="st">"data/group_a_yogurt/02_qpcr_results_yogurt.csv"</span>))</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(qpcr)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 102
+Columns: 4
+$ sample_id      &lt;chr&gt; "UNCH092", "UNCH042", "UNCH015", "UNCH035", "UNCH019", …
+$ qpcr_bacteria  &lt;dbl&gt; 3093064.20, 8275.04, 7532202.40, 4794320.40, 5328343.60…
+$ qpcr_crispatus &lt;dbl&gt; 0.000, 0.000, 0.000, 12.994, 0.000, 0.000, 0.000, 38.58…
+$ qpcr_iners     &lt;dbl&gt; 26.840, 76.040, 554.964, 204308.968, 107806.148, 121045…</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Merge qPCR values with time_point and arm info</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> samples <span class="sc">%&gt;%</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(qpcr, <span class="at">by =</span> <span class="st">"sample_id"</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Clean up labels for nice-looking plots</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">arm =</span> <span class="fu">recode</span>(arm,</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>                 <span class="st">"unchanged_diet"</span> <span class="ot">=</span> <span class="st">"Unchanged diet"</span>,</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>                 <span class="st">"yogurt"</span>         <span class="ot">=</span> <span class="st">"Yogurt"</span>),</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">time_point =</span> <span class="fu">recode</span>(time_point,</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>                        <span class="st">"baseline"</span>         <span class="ot">=</span> <span class="st">"Baseline"</span>,</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>                        <span class="st">"after_antibiotic"</span> <span class="ot">=</span> <span class="st">"After antibiotic"</span>),</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Put time points in the right order (baseline first)</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">time_point =</span> <span class="fu">fct_relevel</span>(time_point, <span class="st">"Baseline"</span>, <span class="st">"After antibiotic"</span>)</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Pivot so each bacteria gets its own row</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>df_long <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">cols      =</span> <span class="fu">c</span>(qpcr_bacteria, qpcr_crispatus, qpcr_iners),</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_to  =</span> <span class="st">"bacteria"</span>,</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">values_to =</span> <span class="st">"value"</span></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">bacteria =</span> <span class="fu">recode</span>(bacteria,</span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>                      <span class="st">"qpcr_bacteria"</span>  <span class="ot">=</span> <span class="st">"Total bacteria"</span>,</span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>                      <span class="st">"qpcr_crispatus"</span> <span class="ot">=</span> <span class="st">"L. crispatus"</span>,</span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>                      <span class="st">"qpcr_iners"</span>     <span class="ot">=</span> <span class="st">"L. iners"</span>),</span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Keep the right order</span></span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">bacteria =</span> <span class="fu">fct_relevel</span>(bacteria, <span class="st">"Total bacteria"</span>, <span class="st">"L. crispatus"</span>, <span class="st">"L. iners"</span>),</span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Flag whether bacteria was detected (value &gt; 0)</span></span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">detected =</span> <span class="fu">if_else</span>(value <span class="sc">&gt;</span> <span class="dv">0</span>, <span class="st">"Detected"</span>, <span class="st">"Not detected"</span>)</span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a><span class="co"># Quick check: does each pid appear at both time points?</span></span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>df_long <span class="sc">%&gt;%</span></span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(bacteria, pid) <span class="sc">%&gt;%</span></span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">n_timepoints =</span> <span class="fu">n_distinct</span>(time_point), <span class="at">.groups =</span> <span class="st">"drop"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(n_timepoints)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 2
+  n_timepoints     n
+         &lt;int&gt; &lt;int&gt;
+1            2   153</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_long)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 7
+  pid    time_point arm            sample_id bacteria             value detected
+  &lt;chr&gt;  &lt;fct&gt;      &lt;chr&gt;          &lt;chr&gt;     &lt;fct&gt;                &lt;dbl&gt; &lt;chr&gt;   
+1 pid_25 Baseline   Unchanged diet UNCH001   Total bacteria 13493009    Detected
+2 pid_25 Baseline   Unchanged diet UNCH001   L. crispatus          0    Not det…
+3 pid_25 Baseline   Unchanged diet UNCH001   L. iners              8.24 Detected
+4 pid_51 Baseline   Yogurt         YOG002    Total bacteria  7532202.   Detected
+5 pid_51 Baseline   Yogurt         YOG002    L. crispatus          0    Not det…
+6 pid_51 Baseline   Yogurt         YOG002    L. iners             12.2  Detected</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Helper function: compute paired Wilcoxon p-values per arm</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>compute_paired_pvals <span class="ot">&lt;-</span> <span class="cf">function</span>(data) {</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  paired_data <span class="ot">&lt;-</span> data <span class="sc">%&gt;%</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(pid, arm, bacteria, time_point, value) <span class="sc">%&gt;%</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> time_point, <span class="at">values_from =</span> value)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  paired_data <span class="sc">%&gt;%</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(arm) <span class="sc">%&gt;%</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>      <span class="at">p =</span> <span class="fu">wilcox.test</span>(Baseline, <span class="st">`</span><span class="at">After antibiotic</span><span class="st">`</span>, <span class="at">paired =</span> <span class="cn">TRUE</span>, <span class="at">exact =</span> <span class="cn">FALSE</span>)<span class="sc">$</span>p.value,</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>      <span class="at">.groups =</span> <span class="st">"drop"</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>      <span class="at">label =</span> <span class="fu">paste0</span>(<span class="st">"Paired Wilcoxon p = "</span>, <span class="fu">formatC</span>(p, <span class="at">format =</span> <span class="st">"e"</span>, <span class="at">digits =</span> <span class="dv">2</span>)),</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>      <span class="at">x_pos =</span> <span class="fl">2.3</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<hr>
+</section>
+</section>
+<section id="overall-participant-summary" class="level2">
+<h2 class="anchored" data-anchor-id="overall-participant-summary">Overall participant summary</h2>
+<p>This first table shows how many participants are in each arm, plus the total number of participants in the study.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Number of unique participants per arm</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>participant_counts <span class="ot">&lt;-</span> df_long <span class="sc">%&gt;%</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(pid, arm, bacteria) <span class="sc">%&gt;%</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(arm, bacteria) <span class="sc">%&gt;%</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>),</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">label =</span> <span class="fu">paste0</span>(n, <span class="st">" ("</span>, pct, <span class="st">"%)"</span>))</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Overall counts</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>overall_counts <span class="ot">&lt;-</span> df_long <span class="sc">%&gt;%</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(pid) <span class="sc">%&gt;%</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">nrow</span>()</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>overall_arm_counts <span class="ot">&lt;-</span> df_long <span class="sc">%&gt;%</span></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(pid, arm) <span class="sc">%&gt;%</span></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(arm) <span class="sc">%&gt;%</span></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n <span class="sc">/</span> overall_counts <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>),</span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>         <span class="at">label =</span> <span class="fu">paste0</span>(n, <span class="st">" ("</span>, pct, <span class="st">"%)"</span>))</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Display</span></span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(</span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>  overall_arm_counts <span class="sc">%&gt;%</span> <span class="fu">select</span>(arm, label),</span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"Arm"</span>, <span class="st">"Participants, n (%)"</span>),</span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>  <span class="at">caption =</span> <span class="fu">paste0</span>(<span class="st">"Table 0: Participants per arm (total N = "</span>, overall_counts, <span class="st">")"</span>)</span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Table 0: Participants per arm (total N = 51)</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Arm</th>
+<th style="text-align: left;">Participants, n (%)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Unchanged diet</td>
+<td style="text-align: left;">25 (49%)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Yogurt</td>
+<td style="text-align: left;">26 (51%)</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<hr>
+</section>
+<section id="total-bacteria-table-paired-plot" class="level2">
+<h2 class="anchored" data-anchor-id="total-bacteria-table-paired-plot">Total bacteria — table + paired plot</h2>
+<section id="table-total-bacteria-by-arm" class="level3">
+<h3 class="anchored" data-anchor-id="table-total-bacteria-by-arm">Table: Total bacteria by arm</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Widen data so each row is one participant with baseline + after_antibiotic</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>total_wide <span class="ot">&lt;-</span> df_long <span class="sc">%&gt;%</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(bacteria <span class="sc">==</span> <span class="st">"Total bacteria"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(pid, arm, time_point, value, detected) <span class="sc">%&gt;%</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_from  =</span> time_point,</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">values_from =</span> <span class="fu">c</span>(value, detected),</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_glue  =</span> <span class="st">"{time_point}_{.value}"</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Participants with detectable bacteria at each time point</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>total_detect <span class="ot">&lt;-</span> total_wide <span class="sc">%&gt;%</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(arm) <span class="sc">%&gt;%</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_total       =</span> <span class="fu">n</span>(),</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">baseline_detected  =</span> <span class="fu">sum</span>(Baseline_detected <span class="sc">==</span> <span class="st">"Detected"</span>),</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">baseline_pct       =</span> <span class="fu">round</span>(baseline_detected <span class="sc">/</span> n_total <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">0</span>),</span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">after_detected     =</span> <span class="fu">sum</span>(<span class="st">`</span><span class="at">After antibiotic_detected</span><span class="st">`</span> <span class="sc">==</span> <span class="st">"Detected"</span>),</span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">after_pct          =</span> <span class="fu">round</span>(after_detected <span class="sc">/</span> n_total <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">0</span>),</span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span></span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">baseline_label =</span> <span class="fu">paste0</span>(baseline_detected, <span class="st">"/"</span>, n_total, <span class="st">" ("</span>, baseline_pct, <span class="st">"%)"</span>),</span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">after_label    =</span> <span class="fu">paste0</span>(after_detected, <span class="st">"/"</span>, n_total, <span class="st">" ("</span>, after_pct, <span class="st">"%)"</span>)</span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a><span class="co"># Median (IQR) at each time point</span></span>
+<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a>total_summary <span class="ot">&lt;-</span> total_wide <span class="sc">%&gt;%</span></span>
+<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(arm) <span class="sc">%&gt;%</span></span>
+<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">baseline_median_iqr =</span> <span class="fu">paste0</span>(</span>
+<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a>      <span class="fu">format</span>(<span class="fu">median</span>(Baseline_value, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), <span class="at">big.mark =</span> <span class="st">","</span>, <span class="at">scientific =</span> <span class="cn">FALSE</span>),</span>
+<span id="cb10-33"><a href="#cb10-33" aria-hidden="true" tabindex="-1"></a>      <span class="st">" ("</span>,</span>
+<span id="cb10-34"><a href="#cb10-34" aria-hidden="true" tabindex="-1"></a>      <span class="fu">format</span>(<span class="fu">IQR</span>(Baseline_value, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), <span class="at">big.mark =</span> <span class="st">","</span>, <span class="at">scientific =</span> <span class="cn">FALSE</span>),</span>
+<span id="cb10-35"><a href="#cb10-35" aria-hidden="true" tabindex="-1"></a>      <span class="st">")"</span></span>
+<span id="cb10-36"><a href="#cb10-36" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb10-37"><a href="#cb10-37" aria-hidden="true" tabindex="-1"></a>    <span class="at">after_median_iqr =</span> <span class="fu">paste0</span>(</span>
+<span id="cb10-38"><a href="#cb10-38" aria-hidden="true" tabindex="-1"></a>      <span class="fu">format</span>(<span class="fu">median</span>(<span class="st">`</span><span class="at">After antibiotic_value</span><span class="st">`</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), <span class="at">big.mark =</span> <span class="st">","</span>, <span class="at">scientific =</span> <span class="cn">FALSE</span>),</span>
+<span id="cb10-39"><a href="#cb10-39" aria-hidden="true" tabindex="-1"></a>      <span class="st">" ("</span>,</span>
+<span id="cb10-40"><a href="#cb10-40" aria-hidden="true" tabindex="-1"></a>      <span class="fu">format</span>(<span class="fu">IQR</span>(<span class="st">`</span><span class="at">After antibiotic_value</span><span class="st">`</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), <span class="at">big.mark =</span> <span class="st">","</span>, <span class="at">scientific =</span> <span class="cn">FALSE</span>),</span>
+<span id="cb10-41"><a href="#cb10-41" aria-hidden="true" tabindex="-1"></a>      <span class="st">")"</span></span>
+<span id="cb10-42"><a href="#cb10-42" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb10-43"><a href="#cb10-43" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span></span>
+<span id="cb10-44"><a href="#cb10-44" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb10-45"><a href="#cb10-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-46"><a href="#cb10-46" aria-hidden="true" tabindex="-1"></a><span class="co"># Paired p-value</span></span>
+<span id="cb10-47"><a href="#cb10-47" aria-hidden="true" tabindex="-1"></a>total_pval_arm <span class="ot">&lt;-</span> total_wide <span class="sc">%&gt;%</span></span>
+<span id="cb10-48"><a href="#cb10-48" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(arm) <span class="sc">%&gt;%</span></span>
+<span id="cb10-49"><a href="#cb10-49" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb10-50"><a href="#cb10-50" aria-hidden="true" tabindex="-1"></a>    <span class="at">p =</span> <span class="fu">wilcox.test</span>(Baseline_value, <span class="st">`</span><span class="at">After antibiotic_value</span><span class="st">`</span>, <span class="at">paired =</span> <span class="cn">TRUE</span>, <span class="at">exact =</span> <span class="cn">FALSE</span>)<span class="sc">$</span>p.value,</span>
+<span id="cb10-51"><a href="#cb10-51" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span></span>
+<span id="cb10-52"><a href="#cb10-52" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb10-53"><a href="#cb10-53" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">p_label =</span> <span class="fu">formatC</span>(p, <span class="at">format =</span> <span class="st">"e"</span>, <span class="at">digits =</span> <span class="dv">2</span>))</span>
+<span id="cb10-54"><a href="#cb10-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-55"><a href="#cb10-55" aria-hidden="true" tabindex="-1"></a><span class="co"># Combine into one table</span></span>
+<span id="cb10-56"><a href="#cb10-56" aria-hidden="true" tabindex="-1"></a>total_table <span class="ot">&lt;-</span> total_detect <span class="sc">%&gt;%</span></span>
+<span id="cb10-57"><a href="#cb10-57" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(total_summary, <span class="at">by =</span> <span class="st">"arm"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb10-58"><a href="#cb10-58" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(total_pval_arm, <span class="at">by =</span> <span class="st">"arm"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb10-59"><a href="#cb10-59" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(</span>
+<span id="cb10-60"><a href="#cb10-60" aria-hidden="true" tabindex="-1"></a>    arm,</span>
+<span id="cb10-61"><a href="#cb10-61" aria-hidden="true" tabindex="-1"></a>    n_total,</span>
+<span id="cb10-62"><a href="#cb10-62" aria-hidden="true" tabindex="-1"></a>    baseline_label,</span>
+<span id="cb10-63"><a href="#cb10-63" aria-hidden="true" tabindex="-1"></a>    baseline_median_iqr,</span>
+<span id="cb10-64"><a href="#cb10-64" aria-hidden="true" tabindex="-1"></a>    after_label,</span>
+<span id="cb10-65"><a href="#cb10-65" aria-hidden="true" tabindex="-1"></a>    after_median_iqr,</span>
+<span id="cb10-66"><a href="#cb10-66" aria-hidden="true" tabindex="-1"></a>    p_label</span>
+<span id="cb10-67"><a href="#cb10-67" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb10-68"><a href="#cb10-68" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(</span>
+<span id="cb10-69"><a href="#cb10-69" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Arm"</span>                  <span class="ot">=</span> arm,</span>
+<span id="cb10-70"><a href="#cb10-70" aria-hidden="true" tabindex="-1"></a>    <span class="st">"N"</span>                    <span class="ot">=</span> n_total,</span>
+<span id="cb10-71"><a href="#cb10-71" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Baseline detected, n (%)"</span> <span class="ot">=</span> baseline_label,</span>
+<span id="cb10-72"><a href="#cb10-72" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Baseline median (IQR)"</span>    <span class="ot">=</span> baseline_median_iqr,</span>
+<span id="cb10-73"><a href="#cb10-73" aria-hidden="true" tabindex="-1"></a>    <span class="st">"After antibiotic detected, n (%)"</span> <span class="ot">=</span> after_label,</span>
+<span id="cb10-74"><a href="#cb10-74" aria-hidden="true" tabindex="-1"></a>    <span class="st">"After antibiotic median (IQR)"</span>    <span class="ot">=</span> after_median_iqr,</span>
+<span id="cb10-75"><a href="#cb10-75" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Paired p-value"</span>             <span class="ot">=</span> p_label</span>
+<span id="cb10-76"><a href="#cb10-76" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb10-77"><a href="#cb10-77" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-78"><a href="#cb10-78" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(total_table, <span class="at">caption =</span> <span class="st">"Table 1: Total bacteria — detection rates and levels by arm"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Table 1: Total bacteria — detection rates and levels by arm</caption>
+<colgroup>
+<col style="width: 10%">
+<col style="width: 2%">
+<col style="width: 17%">
+<col style="width: 15%">
+<col style="width: 22%">
+<col style="width: 20%">
+<col style="width: 10%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Arm</th>
+<th style="text-align: right;">N</th>
+<th style="text-align: left;">Baseline detected, n (%)</th>
+<th style="text-align: left;">Baseline median (IQR)</th>
+<th style="text-align: left;">After antibiotic detected, n (%)</th>
+<th style="text-align: left;">After antibiotic median (IQR)</th>
+<th style="text-align: left;">Paired p-value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Unchanged diet</td>
+<td style="text-align: right;">25</td>
+<td style="text-align: left;">25/25 (100%)</td>
+<td style="text-align: left;">6,596,612 (14,545,636)</td>
+<td style="text-align: left;">25/25 (100%)</td>
+<td style="text-align: left;">451,009.4 (676,803)</td>
+<td style="text-align: left;">1.48e-05</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Yogurt</td>
+<td style="text-align: right;">26</td>
+<td style="text-align: left;">26/26 (100%)</td>
+<td style="text-align: left;">9,057,726 (13,127,655)</td>
+<td style="text-align: left;">26/26 (100%)</td>
+<td style="text-align: left;">145,586.1 (311,657.9)</td>
+<td style="text-align: left;">8.80e-06</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="plot-total-bacteria-paired-change" class="level3">
+<h3 class="anchored" data-anchor-id="plot-total-bacteria-paired-change">Plot: Total bacteria paired change</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>total_df <span class="ot">&lt;-</span> df_long <span class="sc">%&gt;%</span> <span class="fu">filter</span>(bacteria <span class="sc">==</span> <span class="st">"Total bacteria"</span>)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>total_pvals <span class="ot">&lt;-</span> <span class="fu">compute_paired_pvals</span>(total_df)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>total_ymax <span class="ot">&lt;-</span> total_df <span class="sc">%&gt;%</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(arm) <span class="sc">%&gt;%</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">max_val =</span> <span class="fu">max</span>(value, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">*</span> <span class="fl">1.15</span>, <span class="at">.groups =</span> <span class="st">"drop"</span>)</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>total_pvals <span class="ot">&lt;-</span> total_pvals <span class="sc">%&gt;%</span> <span class="fu">left_join</span>(total_ymax, <span class="at">by =</span> <span class="st">"arm"</span>)</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(total_df, <span class="fu">aes</span>(<span class="at">x =</span> time_point, <span class="at">y =</span> value)) <span class="sc">+</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">group =</span> pid), <span class="at">color =</span> <span class="st">"grey60"</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>, <span class="at">linewidth =</span> <span class="fl">0.7</span>) <span class="sc">+</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="fu">aes</span>(<span class="at">fill =</span> arm), <span class="at">outlier.shape =</span> <span class="cn">NA</span>, <span class="at">alpha =</span> <span class="fl">0.4</span>, <span class="at">width =</span> <span class="fl">0.4</span>) <span class="sc">+</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">color =</span> arm), <span class="at">size =</span> <span class="fl">2.5</span>, <span class="at">alpha =</span> <span class="fl">0.7</span>) <span class="sc">+</span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> arm) <span class="sc">+</span></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"Unchanged diet"</span> <span class="ot">=</span> <span class="st">"#4A90D9"</span>, <span class="st">"Yogurt"</span> <span class="ot">=</span> <span class="st">"#E8833A"</span>)) <span class="sc">+</span></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"Unchanged diet"</span> <span class="ot">=</span> <span class="st">"#4A90D9"</span>, <span class="st">"Yogurt"</span> <span class="ot">=</span> <span class="st">"#E8833A"</span>)) <span class="sc">+</span></span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(</span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">data    =</span> total_pvals,</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">x =</span> x_pos, <span class="at">y =</span> max_val, <span class="at">label =</span> label),</span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">inherit.aes =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">hjust =</span> <span class="dv">1</span>, <span class="at">vjust =</span> <span class="dv">1</span>, <span class="at">size =</span> <span class="fl">3.5</span>, <span class="at">color =</span> <span class="st">"grey30"</span></span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">title    =</span> <span class="st">"Total bacteria"</span>,</span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Paired change from baseline to after antibiotics"</span>,</span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">x        =</span> <span class="cn">NULL</span>,</span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">y        =</span> <span class="st">"Bacterial load (copies/mL)"</span></span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>(<span class="at">base_size =</span> <span class="dv">14</span>) <span class="sc">+</span></span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">strip.text       =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">"bold"</span>, <span class="at">size =</span> <span class="dv">13</span>),</span>
+<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title       =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">"bold"</span>, <span class="at">hjust =</span> <span class="fl">0.5</span>, <span class="at">size =</span> <span class="dv">16</span>),</span>
+<span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.subtitle    =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>, <span class="at">color =</span> <span class="st">"grey40"</span>),</span>
+<span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.position  =</span> <span class="st">"none"</span></span>
+<span id="cb11-35"><a href="#cb11-35" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="07-yogurt-bacteria-paired_files/figure-html/plot-total-bacteria-1.png" class="img-fluid figure-img" width="864"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><strong>Reading this:</strong> Each grey line is one participant. Sloping <strong>down</strong> means their bacteria went down after antibiotics. The p-value tests if the overall change is different from zero.</p>
+<hr>
+</section>
+</section>
+<section id="lactobacillus-crispatus-table-paired-plot" class="level2">
+<h2 class="anchored" data-anchor-id="lactobacillus-crispatus-table-paired-plot"><em>Lactobacillus crispatus</em> — table + paired plot</h2>
+<section id="table-l.-crispatus-by-arm" class="level3">
+<h3 class="anchored" data-anchor-id="table-l.-crispatus-by-arm">Table: <em>L. crispatus</em> by arm</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>crispatus_wide <span class="ot">&lt;-</span> df_long <span class="sc">%&gt;%</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(bacteria <span class="sc">==</span> <span class="st">"L. crispatus"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(pid, arm, time_point, value, detected) <span class="sc">%&gt;%</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_from  =</span> time_point,</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">values_from =</span> <span class="fu">c</span>(value, detected),</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_glue  =</span> <span class="st">"{time_point}_{.value}"</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>crispatus_detect <span class="ot">&lt;-</span> crispatus_wide <span class="sc">%&gt;%</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(arm) <span class="sc">%&gt;%</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_total            =</span> <span class="fu">n</span>(),</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">baseline_detected  =</span> <span class="fu">sum</span>(Baseline_detected <span class="sc">==</span> <span class="st">"Detected"</span>),</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">baseline_pct       =</span> <span class="fu">round</span>(baseline_detected <span class="sc">/</span> n_total <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">0</span>),</span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">after_detected     =</span> <span class="fu">sum</span>(<span class="st">`</span><span class="at">After antibiotic_detected</span><span class="st">`</span> <span class="sc">==</span> <span class="st">"Detected"</span>),</span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">after_pct          =</span> <span class="fu">round</span>(after_detected <span class="sc">/</span> n_total <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">0</span>),</span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span></span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">baseline_label =</span> <span class="fu">paste0</span>(baseline_detected, <span class="st">"/"</span>, n_total, <span class="st">" ("</span>, baseline_pct, <span class="st">"%)"</span>),</span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">after_label    =</span> <span class="fu">paste0</span>(after_detected, <span class="st">"/"</span>, n_total, <span class="st">" ("</span>, after_pct, <span class="st">"%)"</span>)</span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a>crispatus_summary <span class="ot">&lt;-</span> crispatus_wide <span class="sc">%&gt;%</span></span>
+<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(arm) <span class="sc">%&gt;%</span></span>
+<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">baseline_median_iqr =</span> <span class="fu">paste0</span>(</span>
+<span id="cb12-29"><a href="#cb12-29" aria-hidden="true" tabindex="-1"></a>      <span class="fu">format</span>(<span class="fu">median</span>(Baseline_value, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), <span class="at">big.mark =</span> <span class="st">","</span>, <span class="at">scientific =</span> <span class="cn">FALSE</span>),</span>
+<span id="cb12-30"><a href="#cb12-30" aria-hidden="true" tabindex="-1"></a>      <span class="st">" ("</span>,</span>
+<span id="cb12-31"><a href="#cb12-31" aria-hidden="true" tabindex="-1"></a>      <span class="fu">format</span>(<span class="fu">IQR</span>(Baseline_value, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), <span class="at">big.mark =</span> <span class="st">","</span>, <span class="at">scientific =</span> <span class="cn">FALSE</span>),</span>
+<span id="cb12-32"><a href="#cb12-32" aria-hidden="true" tabindex="-1"></a>      <span class="st">")"</span></span>
+<span id="cb12-33"><a href="#cb12-33" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb12-34"><a href="#cb12-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">after_median_iqr =</span> <span class="fu">paste0</span>(</span>
+<span id="cb12-35"><a href="#cb12-35" aria-hidden="true" tabindex="-1"></a>      <span class="fu">format</span>(<span class="fu">median</span>(<span class="st">`</span><span class="at">After antibiotic_value</span><span class="st">`</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), <span class="at">big.mark =</span> <span class="st">","</span>, <span class="at">scientific =</span> <span class="cn">FALSE</span>),</span>
+<span id="cb12-36"><a href="#cb12-36" aria-hidden="true" tabindex="-1"></a>      <span class="st">" ("</span>,</span>
+<span id="cb12-37"><a href="#cb12-37" aria-hidden="true" tabindex="-1"></a>      <span class="fu">format</span>(<span class="fu">IQR</span>(<span class="st">`</span><span class="at">After antibiotic_value</span><span class="st">`</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), <span class="at">big.mark =</span> <span class="st">","</span>, <span class="at">scientific =</span> <span class="cn">FALSE</span>),</span>
+<span id="cb12-38"><a href="#cb12-38" aria-hidden="true" tabindex="-1"></a>      <span class="st">")"</span></span>
+<span id="cb12-39"><a href="#cb12-39" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb12-40"><a href="#cb12-40" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span></span>
+<span id="cb12-41"><a href="#cb12-41" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb12-42"><a href="#cb12-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-43"><a href="#cb12-43" aria-hidden="true" tabindex="-1"></a>crispatus_pval_arm <span class="ot">&lt;-</span> crispatus_wide <span class="sc">%&gt;%</span></span>
+<span id="cb12-44"><a href="#cb12-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(arm) <span class="sc">%&gt;%</span></span>
+<span id="cb12-45"><a href="#cb12-45" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb12-46"><a href="#cb12-46" aria-hidden="true" tabindex="-1"></a>    <span class="at">p =</span> <span class="fu">wilcox.test</span>(Baseline_value, <span class="st">`</span><span class="at">After antibiotic_value</span><span class="st">`</span>, <span class="at">paired =</span> <span class="cn">TRUE</span>, <span class="at">exact =</span> <span class="cn">FALSE</span>)<span class="sc">$</span>p.value,</span>
+<span id="cb12-47"><a href="#cb12-47" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span></span>
+<span id="cb12-48"><a href="#cb12-48" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb12-49"><a href="#cb12-49" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">p_label =</span> <span class="fu">formatC</span>(p, <span class="at">format =</span> <span class="st">"e"</span>, <span class="at">digits =</span> <span class="dv">2</span>))</span>
+<span id="cb12-50"><a href="#cb12-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-51"><a href="#cb12-51" aria-hidden="true" tabindex="-1"></a>crispatus_table <span class="ot">&lt;-</span> crispatus_detect <span class="sc">%&gt;%</span></span>
+<span id="cb12-52"><a href="#cb12-52" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(crispatus_summary, <span class="at">by =</span> <span class="st">"arm"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb12-53"><a href="#cb12-53" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(crispatus_pval_arm, <span class="at">by =</span> <span class="st">"arm"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb12-54"><a href="#cb12-54" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(arm, n_total, baseline_label, baseline_median_iqr,</span>
+<span id="cb12-55"><a href="#cb12-55" aria-hidden="true" tabindex="-1"></a>         after_label, after_median_iqr, p_label) <span class="sc">%&gt;%</span></span>
+<span id="cb12-56"><a href="#cb12-56" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(</span>
+<span id="cb12-57"><a href="#cb12-57" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Arm"</span>                               <span class="ot">=</span> arm,</span>
+<span id="cb12-58"><a href="#cb12-58" aria-hidden="true" tabindex="-1"></a>    <span class="st">"N"</span>                                 <span class="ot">=</span> n_total,</span>
+<span id="cb12-59"><a href="#cb12-59" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Baseline detected, n (%)"</span>          <span class="ot">=</span> baseline_label,</span>
+<span id="cb12-60"><a href="#cb12-60" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Baseline median (IQR)"</span>             <span class="ot">=</span> baseline_median_iqr,</span>
+<span id="cb12-61"><a href="#cb12-61" aria-hidden="true" tabindex="-1"></a>    <span class="st">"After antibiotic detected, n (%)"</span>  <span class="ot">=</span> after_label,</span>
+<span id="cb12-62"><a href="#cb12-62" aria-hidden="true" tabindex="-1"></a>    <span class="st">"After antibiotic median (IQR)"</span>     <span class="ot">=</span> after_median_iqr,</span>
+<span id="cb12-63"><a href="#cb12-63" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Paired p-value"</span>                    <span class="ot">=</span> p_label</span>
+<span id="cb12-64"><a href="#cb12-64" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb12-65"><a href="#cb12-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-66"><a href="#cb12-66" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(crispatus_table,</span>
+<span id="cb12-67"><a href="#cb12-67" aria-hidden="true" tabindex="-1"></a>             <span class="at">caption =</span> <span class="st">"Table 2: L. crispatus — detection rates and levels by arm"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Table 2: L. crispatus — detection rates and levels by arm</caption>
+<colgroup>
+<col style="width: 10%">
+<col style="width: 2%">
+<col style="width: 17%">
+<col style="width: 15%">
+<col style="width: 23%">
+<col style="width: 20%">
+<col style="width: 10%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Arm</th>
+<th style="text-align: right;">N</th>
+<th style="text-align: left;">Baseline detected, n (%)</th>
+<th style="text-align: left;">Baseline median (IQR)</th>
+<th style="text-align: left;">After antibiotic detected, n (%)</th>
+<th style="text-align: left;">After antibiotic median (IQR)</th>
+<th style="text-align: left;">Paired p-value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Unchanged diet</td>
+<td style="text-align: right;">25</td>
+<td style="text-align: left;">1/25 (4%)</td>
+<td style="text-align: left;">0 (0)</td>
+<td style="text-align: left;">12/25 (48%)</td>
+<td style="text-align: left;">0 (11,636.09)</td>
+<td style="text-align: left;">5.74e-03</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Yogurt</td>
+<td style="text-align: right;">26</td>
+<td style="text-align: left;">1/26 (4%)</td>
+<td style="text-align: left;">0 (0)</td>
+<td style="text-align: left;">22/26 (85%)</td>
+<td style="text-align: left;">434.336 (48,575.99)</td>
+<td style="text-align: left;">4.29e-05</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="plot-l.-crispatus-paired-change" class="level3">
+<h3 class="anchored" data-anchor-id="plot-l.-crispatus-paired-change">Plot: <em>L. crispatus</em> paired change</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>crispatus_df <span class="ot">&lt;-</span> df_long <span class="sc">%&gt;%</span> <span class="fu">filter</span>(bacteria <span class="sc">==</span> <span class="st">"L. crispatus"</span>)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>crispatus_pvals <span class="ot">&lt;-</span> <span class="fu">compute_paired_pvals</span>(crispatus_df)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>crispatus_ymax <span class="ot">&lt;-</span> crispatus_df <span class="sc">%&gt;%</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(arm) <span class="sc">%&gt;%</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">max_val =</span> <span class="fu">max</span>(value, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">*</span> <span class="fl">1.15</span>, <span class="at">.groups =</span> <span class="st">"drop"</span>)</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>crispatus_pvals <span class="ot">&lt;-</span> crispatus_pvals <span class="sc">%&gt;%</span> <span class="fu">left_join</span>(crispatus_ymax, <span class="at">by =</span> <span class="st">"arm"</span>)</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(crispatus_df, <span class="fu">aes</span>(<span class="at">x =</span> time_point, <span class="at">y =</span> value)) <span class="sc">+</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">group =</span> pid), <span class="at">color =</span> <span class="st">"grey60"</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>, <span class="at">linewidth =</span> <span class="fl">0.7</span>) <span class="sc">+</span></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="fu">aes</span>(<span class="at">fill =</span> arm), <span class="at">outlier.shape =</span> <span class="cn">NA</span>, <span class="at">alpha =</span> <span class="fl">0.4</span>, <span class="at">width =</span> <span class="fl">0.4</span>) <span class="sc">+</span></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">color =</span> arm), <span class="at">size =</span> <span class="fl">2.5</span>, <span class="at">alpha =</span> <span class="fl">0.7</span>) <span class="sc">+</span></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> arm) <span class="sc">+</span></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"Unchanged diet"</span> <span class="ot">=</span> <span class="st">"#4A90D9"</span>, <span class="st">"Yogurt"</span> <span class="ot">=</span> <span class="st">"#E8833A"</span>)) <span class="sc">+</span></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"Unchanged diet"</span> <span class="ot">=</span> <span class="st">"#4A90D9"</span>, <span class="st">"Yogurt"</span> <span class="ot">=</span> <span class="st">"#E8833A"</span>)) <span class="sc">+</span></span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(</span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">data    =</span> crispatus_pvals,</span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">x =</span> x_pos, <span class="at">y =</span> max_val, <span class="at">label =</span> label),</span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">inherit.aes =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">hjust =</span> <span class="dv">1</span>, <span class="at">vjust =</span> <span class="dv">1</span>, <span class="at">size =</span> <span class="fl">3.5</span>, <span class="at">color =</span> <span class="st">"grey30"</span></span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">title    =</span> <span class="st">"Lactobacillus crispatus"</span>,</span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Paired change from baseline to after antibiotics"</span>,</span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">x        =</span> <span class="cn">NULL</span>,</span>
+<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">y        =</span> <span class="st">"Bacterial load (copies/mL)"</span></span>
+<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>(<span class="at">base_size =</span> <span class="dv">14</span>) <span class="sc">+</span></span>
+<span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb13-31"><a href="#cb13-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">strip.text       =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">"bold"</span>, <span class="at">size =</span> <span class="dv">13</span>),</span>
+<span id="cb13-32"><a href="#cb13-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title       =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">"bold"</span>, <span class="at">hjust =</span> <span class="fl">0.5</span>, <span class="at">size =</span> <span class="dv">16</span>),</span>
+<span id="cb13-33"><a href="#cb13-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.subtitle    =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>, <span class="at">color =</span> <span class="st">"grey40"</span>),</span>
+<span id="cb13-34"><a href="#cb13-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.position  =</span> <span class="st">"none"</span></span>
+<span id="cb13-35"><a href="#cb13-35" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="07-yogurt-bacteria-paired_files/figure-html/plot-crispatus-1.png" class="img-fluid figure-img" width="864"></p>
+</figure>
+</div>
+</div>
+</div>
+<hr>
+</section>
+</section>
+<section id="lactobacillus-iners-table-paired-plot" class="level2">
+<h2 class="anchored" data-anchor-id="lactobacillus-iners-table-paired-plot"><em>Lactobacillus iners</em> — table + paired plot</h2>
+<section id="table-l.-iners-by-arm" class="level3">
+<h3 class="anchored" data-anchor-id="table-l.-iners-by-arm">Table: <em>L. iners</em> by arm</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>iners_wide <span class="ot">&lt;-</span> df_long <span class="sc">%&gt;%</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(bacteria <span class="sc">==</span> <span class="st">"L. iners"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(pid, arm, time_point, value, detected) <span class="sc">%&gt;%</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_from  =</span> time_point,</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">values_from =</span> <span class="fu">c</span>(value, detected),</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_glue  =</span> <span class="st">"{time_point}_{.value}"</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>iners_detect <span class="ot">&lt;-</span> iners_wide <span class="sc">%&gt;%</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(arm) <span class="sc">%&gt;%</span></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_total            =</span> <span class="fu">n</span>(),</span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">baseline_detected  =</span> <span class="fu">sum</span>(Baseline_detected <span class="sc">==</span> <span class="st">"Detected"</span>),</span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">baseline_pct       =</span> <span class="fu">round</span>(baseline_detected <span class="sc">/</span> n_total <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">0</span>),</span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">after_detected     =</span> <span class="fu">sum</span>(<span class="st">`</span><span class="at">After antibiotic_detected</span><span class="st">`</span> <span class="sc">==</span> <span class="st">"Detected"</span>),</span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">after_pct          =</span> <span class="fu">round</span>(after_detected <span class="sc">/</span> n_total <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">0</span>),</span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span></span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">baseline_label =</span> <span class="fu">paste0</span>(baseline_detected, <span class="st">"/"</span>, n_total, <span class="st">" ("</span>, baseline_pct, <span class="st">"%)"</span>),</span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">after_label    =</span> <span class="fu">paste0</span>(after_detected, <span class="st">"/"</span>, n_total, <span class="st">" ("</span>, after_pct, <span class="st">"%)"</span>)</span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a>iners_summary <span class="ot">&lt;-</span> iners_wide <span class="sc">%&gt;%</span></span>
+<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(arm) <span class="sc">%&gt;%</span></span>
+<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb14-28"><a href="#cb14-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">baseline_median_iqr =</span> <span class="fu">paste0</span>(</span>
+<span id="cb14-29"><a href="#cb14-29" aria-hidden="true" tabindex="-1"></a>      <span class="fu">format</span>(<span class="fu">median</span>(Baseline_value, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), <span class="at">big.mark =</span> <span class="st">","</span>, <span class="at">scientific =</span> <span class="cn">FALSE</span>),</span>
+<span id="cb14-30"><a href="#cb14-30" aria-hidden="true" tabindex="-1"></a>      <span class="st">" ("</span>,</span>
+<span id="cb14-31"><a href="#cb14-31" aria-hidden="true" tabindex="-1"></a>      <span class="fu">format</span>(<span class="fu">IQR</span>(Baseline_value, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), <span class="at">big.mark =</span> <span class="st">","</span>, <span class="at">scientific =</span> <span class="cn">FALSE</span>),</span>
+<span id="cb14-32"><a href="#cb14-32" aria-hidden="true" tabindex="-1"></a>      <span class="st">")"</span></span>
+<span id="cb14-33"><a href="#cb14-33" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb14-34"><a href="#cb14-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">after_median_iqr =</span> <span class="fu">paste0</span>(</span>
+<span id="cb14-35"><a href="#cb14-35" aria-hidden="true" tabindex="-1"></a>      <span class="fu">format</span>(<span class="fu">median</span>(<span class="st">`</span><span class="at">After antibiotic_value</span><span class="st">`</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), <span class="at">big.mark =</span> <span class="st">","</span>, <span class="at">scientific =</span> <span class="cn">FALSE</span>),</span>
+<span id="cb14-36"><a href="#cb14-36" aria-hidden="true" tabindex="-1"></a>      <span class="st">" ("</span>,</span>
+<span id="cb14-37"><a href="#cb14-37" aria-hidden="true" tabindex="-1"></a>      <span class="fu">format</span>(<span class="fu">IQR</span>(<span class="st">`</span><span class="at">After antibiotic_value</span><span class="st">`</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), <span class="at">big.mark =</span> <span class="st">","</span>, <span class="at">scientific =</span> <span class="cn">FALSE</span>),</span>
+<span id="cb14-38"><a href="#cb14-38" aria-hidden="true" tabindex="-1"></a>      <span class="st">")"</span></span>
+<span id="cb14-39"><a href="#cb14-39" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb14-40"><a href="#cb14-40" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span></span>
+<span id="cb14-41"><a href="#cb14-41" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb14-42"><a href="#cb14-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-43"><a href="#cb14-43" aria-hidden="true" tabindex="-1"></a>iners_pval_arm <span class="ot">&lt;-</span> iners_wide <span class="sc">%&gt;%</span></span>
+<span id="cb14-44"><a href="#cb14-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(arm) <span class="sc">%&gt;%</span></span>
+<span id="cb14-45"><a href="#cb14-45" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb14-46"><a href="#cb14-46" aria-hidden="true" tabindex="-1"></a>    <span class="at">p =</span> <span class="fu">wilcox.test</span>(Baseline_value, <span class="st">`</span><span class="at">After antibiotic_value</span><span class="st">`</span>, <span class="at">paired =</span> <span class="cn">TRUE</span>, <span class="at">exact =</span> <span class="cn">FALSE</span>)<span class="sc">$</span>p.value,</span>
+<span id="cb14-47"><a href="#cb14-47" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span></span>
+<span id="cb14-48"><a href="#cb14-48" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb14-49"><a href="#cb14-49" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">p_label =</span> <span class="fu">formatC</span>(p, <span class="at">format =</span> <span class="st">"e"</span>, <span class="at">digits =</span> <span class="dv">2</span>))</span>
+<span id="cb14-50"><a href="#cb14-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-51"><a href="#cb14-51" aria-hidden="true" tabindex="-1"></a>iners_table <span class="ot">&lt;-</span> iners_detect <span class="sc">%&gt;%</span></span>
+<span id="cb14-52"><a href="#cb14-52" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(iners_summary, <span class="at">by =</span> <span class="st">"arm"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb14-53"><a href="#cb14-53" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(iners_pval_arm, <span class="at">by =</span> <span class="st">"arm"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb14-54"><a href="#cb14-54" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(arm, n_total, baseline_label, baseline_median_iqr,</span>
+<span id="cb14-55"><a href="#cb14-55" aria-hidden="true" tabindex="-1"></a>         after_label, after_median_iqr, p_label) <span class="sc">%&gt;%</span></span>
+<span id="cb14-56"><a href="#cb14-56" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(</span>
+<span id="cb14-57"><a href="#cb14-57" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Arm"</span>                               <span class="ot">=</span> arm,</span>
+<span id="cb14-58"><a href="#cb14-58" aria-hidden="true" tabindex="-1"></a>    <span class="st">"N"</span>                                 <span class="ot">=</span> n_total,</span>
+<span id="cb14-59"><a href="#cb14-59" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Baseline detected, n (%)"</span>          <span class="ot">=</span> baseline_label,</span>
+<span id="cb14-60"><a href="#cb14-60" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Baseline median (IQR)"</span>             <span class="ot">=</span> baseline_median_iqr,</span>
+<span id="cb14-61"><a href="#cb14-61" aria-hidden="true" tabindex="-1"></a>    <span class="st">"After antibiotic detected, n (%)"</span>  <span class="ot">=</span> after_label,</span>
+<span id="cb14-62"><a href="#cb14-62" aria-hidden="true" tabindex="-1"></a>    <span class="st">"After antibiotic median (IQR)"</span>     <span class="ot">=</span> after_median_iqr,</span>
+<span id="cb14-63"><a href="#cb14-63" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Paired p-value"</span>                    <span class="ot">=</span> p_label</span>
+<span id="cb14-64"><a href="#cb14-64" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb14-65"><a href="#cb14-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-66"><a href="#cb14-66" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(iners_table,</span>
+<span id="cb14-67"><a href="#cb14-67" aria-hidden="true" tabindex="-1"></a>             <span class="at">caption =</span> <span class="st">"Table 3: L. iners — detection rates and levels by arm"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Table 3: L. iners — detection rates and levels by arm</caption>
+<colgroup>
+<col style="width: 10%">
+<col style="width: 2%">
+<col style="width: 17%">
+<col style="width: 15%">
+<col style="width: 23%">
+<col style="width: 20%">
+<col style="width: 10%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Arm</th>
+<th style="text-align: right;">N</th>
+<th style="text-align: left;">Baseline detected, n (%)</th>
+<th style="text-align: left;">Baseline median (IQR)</th>
+<th style="text-align: left;">After antibiotic detected, n (%)</th>
+<th style="text-align: left;">After antibiotic median (IQR)</th>
+<th style="text-align: left;">Paired p-value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Unchanged diet</td>
+<td style="text-align: right;">25</td>
+<td style="text-align: left;">24/25 (96%)</td>
+<td style="text-align: left;">89.092 (3,766.872)</td>
+<td style="text-align: left;">25/25 (100%)</td>
+<td style="text-align: left;">296,150.7 (264,609.3)</td>
+<td style="text-align: left;">1.67e-05</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Yogurt</td>
+<td style="text-align: right;">26</td>
+<td style="text-align: left;">19/26 (73%)</td>
+<td style="text-align: left;">12.24 (968.3445)</td>
+<td style="text-align: left;">26/26 (100%)</td>
+<td style="text-align: left;">317,714.3 (524,453.6)</td>
+<td style="text-align: left;">2.40e-05</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="plot-l.-iners-paired-change" class="level3">
+<h3 class="anchored" data-anchor-id="plot-l.-iners-paired-change">Plot: <em>L. iners</em> paired change</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>iners_df <span class="ot">&lt;-</span> df_long <span class="sc">%&gt;%</span> <span class="fu">filter</span>(bacteria <span class="sc">==</span> <span class="st">"L. iners"</span>)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>iners_pvals <span class="ot">&lt;-</span> <span class="fu">compute_paired_pvals</span>(iners_df)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>iners_ymax <span class="ot">&lt;-</span> iners_df <span class="sc">%&gt;%</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(arm) <span class="sc">%&gt;%</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">max_val =</span> <span class="fu">max</span>(value, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">*</span> <span class="fl">1.15</span>, <span class="at">.groups =</span> <span class="st">"drop"</span>)</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>iners_pvals <span class="ot">&lt;-</span> iners_pvals <span class="sc">%&gt;%</span> <span class="fu">left_join</span>(iners_ymax, <span class="at">by =</span> <span class="st">"arm"</span>)</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(iners_df, <span class="fu">aes</span>(<span class="at">x =</span> time_point, <span class="at">y =</span> value)) <span class="sc">+</span></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">group =</span> pid), <span class="at">color =</span> <span class="st">"grey60"</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>, <span class="at">linewidth =</span> <span class="fl">0.7</span>) <span class="sc">+</span></span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="fu">aes</span>(<span class="at">fill =</span> arm), <span class="at">outlier.shape =</span> <span class="cn">NA</span>, <span class="at">alpha =</span> <span class="fl">0.4</span>, <span class="at">width =</span> <span class="fl">0.4</span>) <span class="sc">+</span></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">color =</span> arm), <span class="at">size =</span> <span class="fl">2.5</span>, <span class="at">alpha =</span> <span class="fl">0.7</span>) <span class="sc">+</span></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> arm) <span class="sc">+</span></span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"Unchanged diet"</span> <span class="ot">=</span> <span class="st">"#4A90D9"</span>, <span class="st">"Yogurt"</span> <span class="ot">=</span> <span class="st">"#E8833A"</span>)) <span class="sc">+</span></span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"Unchanged diet"</span> <span class="ot">=</span> <span class="st">"#4A90D9"</span>, <span class="st">"Yogurt"</span> <span class="ot">=</span> <span class="st">"#E8833A"</span>)) <span class="sc">+</span></span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(</span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">data    =</span> iners_pvals,</span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">x =</span> x_pos, <span class="at">y =</span> max_val, <span class="at">label =</span> label),</span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">inherit.aes =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">hjust =</span> <span class="dv">1</span>, <span class="at">vjust =</span> <span class="dv">1</span>, <span class="at">size =</span> <span class="fl">3.5</span>, <span class="at">color =</span> <span class="st">"grey30"</span></span>
+<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">title    =</span> <span class="st">"Lactobacillus iners"</span>,</span>
+<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Paired change from baseline to after antibiotics"</span>,</span>
+<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">x        =</span> <span class="cn">NULL</span>,</span>
+<span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">y        =</span> <span class="st">"Bacterial load (copies/mL)"</span></span>
+<span id="cb15-28"><a href="#cb15-28" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb15-29"><a href="#cb15-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>(<span class="at">base_size =</span> <span class="dv">14</span>) <span class="sc">+</span></span>
+<span id="cb15-30"><a href="#cb15-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb15-31"><a href="#cb15-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">strip.text       =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">"bold"</span>, <span class="at">size =</span> <span class="dv">13</span>),</span>
+<span id="cb15-32"><a href="#cb15-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title       =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">"bold"</span>, <span class="at">hjust =</span> <span class="fl">0.5</span>, <span class="at">size =</span> <span class="dv">16</span>),</span>
+<span id="cb15-33"><a href="#cb15-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.subtitle    =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>, <span class="at">color =</span> <span class="st">"grey40"</span>),</span>
+<span id="cb15-34"><a href="#cb15-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.position  =</span> <span class="st">"none"</span></span>
+<span id="cb15-35"><a href="#cb15-35" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="07-yogurt-bacteria-paired_files/figure-html/plot-iners-1.png" class="img-fluid figure-img" width="864"></p>
+</figure>
+</div>
+</div>
+</div>
+<hr>
+</section>
+</section>
+<section id="master-summary-all-bacteria-combined" class="level2">
+<h2 class="anchored" data-anchor-id="master-summary-all-bacteria-combined">Master summary: All bacteria combined</h2>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Build one big table for all bacteria</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>build_bacteria_table <span class="ot">&lt;-</span> <span class="cf">function</span>(bacteria_name) {</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  wide <span class="ot">&lt;-</span> df_long <span class="sc">%&gt;%</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(bacteria <span class="sc">==</span> bacteria_name) <span class="sc">%&gt;%</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(pid, arm, time_point, value, detected) <span class="sc">%&gt;%</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pivot_wider</span>(</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>      <span class="at">names_from  =</span> time_point,</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>      <span class="at">values_from =</span> <span class="fu">c</span>(value, detected),</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>      <span class="at">names_glue  =</span> <span class="st">"{time_point}_{.value}"</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>  detect <span class="ot">&lt;-</span> wide <span class="sc">%&gt;%</span></span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(arm) <span class="sc">%&gt;%</span></span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(</span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>      <span class="at">n_total            =</span> <span class="fu">n</span>(),</span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>      <span class="at">baseline_detected  =</span> <span class="fu">sum</span>(Baseline_detected <span class="sc">==</span> <span class="st">"Detected"</span>),</span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>      <span class="at">baseline_pct       =</span> <span class="fu">round</span>(baseline_detected <span class="sc">/</span> n_total <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">0</span>),</span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>      <span class="at">after_detected     =</span> <span class="fu">sum</span>(<span class="st">`</span><span class="at">After antibiotic_detected</span><span class="st">`</span> <span class="sc">==</span> <span class="st">"Detected"</span>),</span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>      <span class="at">after_pct          =</span> <span class="fu">round</span>(after_detected <span class="sc">/</span> n_total <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">0</span>),</span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>      <span class="at">.groups =</span> <span class="st">"drop"</span></span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
+<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
+<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>      <span class="at">baseline_lbl =</span> <span class="fu">paste0</span>(baseline_detected, <span class="st">"/"</span>, n_total, <span class="st">" ("</span>, baseline_pct, <span class="st">"%)"</span>),</span>
+<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a>      <span class="at">after_lbl    =</span> <span class="fu">paste0</span>(after_detected, <span class="st">"/"</span>, n_total, <span class="st">" ("</span>, after_pct, <span class="st">"%)"</span>)</span>
+<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a>  summary <span class="ot">&lt;-</span> wide <span class="sc">%&gt;%</span></span>
+<span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(arm) <span class="sc">%&gt;%</span></span>
+<span id="cb16-29"><a href="#cb16-29" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(</span>
+<span id="cb16-30"><a href="#cb16-30" aria-hidden="true" tabindex="-1"></a>      <span class="at">bl_med_iqr =</span> <span class="fu">paste0</span>(</span>
+<span id="cb16-31"><a href="#cb16-31" aria-hidden="true" tabindex="-1"></a>        <span class="fu">format</span>(<span class="fu">median</span>(Baseline_value, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), <span class="at">big.mark =</span> <span class="st">","</span>, <span class="at">scientific =</span> <span class="cn">FALSE</span>),</span>
+<span id="cb16-32"><a href="#cb16-32" aria-hidden="true" tabindex="-1"></a>        <span class="st">" ("</span>,</span>
+<span id="cb16-33"><a href="#cb16-33" aria-hidden="true" tabindex="-1"></a>        <span class="fu">format</span>(<span class="fu">IQR</span>(Baseline_value, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), <span class="at">big.mark =</span> <span class="st">","</span>, <span class="at">scientific =</span> <span class="cn">FALSE</span>),</span>
+<span id="cb16-34"><a href="#cb16-34" aria-hidden="true" tabindex="-1"></a>        <span class="st">")"</span></span>
+<span id="cb16-35"><a href="#cb16-35" aria-hidden="true" tabindex="-1"></a>      ),</span>
+<span id="cb16-36"><a href="#cb16-36" aria-hidden="true" tabindex="-1"></a>      <span class="at">aft_med_iqr =</span> <span class="fu">paste0</span>(</span>
+<span id="cb16-37"><a href="#cb16-37" aria-hidden="true" tabindex="-1"></a>        <span class="fu">format</span>(<span class="fu">median</span>(<span class="st">`</span><span class="at">After antibiotic_value</span><span class="st">`</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), <span class="at">big.mark =</span> <span class="st">","</span>, <span class="at">scientific =</span> <span class="cn">FALSE</span>),</span>
+<span id="cb16-38"><a href="#cb16-38" aria-hidden="true" tabindex="-1"></a>        <span class="st">" ("</span>,</span>
+<span id="cb16-39"><a href="#cb16-39" aria-hidden="true" tabindex="-1"></a>        <span class="fu">format</span>(<span class="fu">IQR</span>(<span class="st">`</span><span class="at">After antibiotic_value</span><span class="st">`</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), <span class="at">big.mark =</span> <span class="st">","</span>, <span class="at">scientific =</span> <span class="cn">FALSE</span>),</span>
+<span id="cb16-40"><a href="#cb16-40" aria-hidden="true" tabindex="-1"></a>        <span class="st">")"</span></span>
+<span id="cb16-41"><a href="#cb16-41" aria-hidden="true" tabindex="-1"></a>      ),</span>
+<span id="cb16-42"><a href="#cb16-42" aria-hidden="true" tabindex="-1"></a>      <span class="at">.groups =</span> <span class="st">"drop"</span></span>
+<span id="cb16-43"><a href="#cb16-43" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb16-44"><a href="#cb16-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-45"><a href="#cb16-45" aria-hidden="true" tabindex="-1"></a>  pval <span class="ot">&lt;-</span> wide <span class="sc">%&gt;%</span></span>
+<span id="cb16-46"><a href="#cb16-46" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(arm) <span class="sc">%&gt;%</span></span>
+<span id="cb16-47"><a href="#cb16-47" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(</span>
+<span id="cb16-48"><a href="#cb16-48" aria-hidden="true" tabindex="-1"></a>      <span class="at">p =</span> <span class="fu">wilcox.test</span>(Baseline_value, <span class="st">`</span><span class="at">After antibiotic_value</span><span class="st">`</span>, <span class="at">paired =</span> <span class="cn">TRUE</span>, <span class="at">exact =</span> <span class="cn">FALSE</span>)<span class="sc">$</span>p.value,</span>
+<span id="cb16-49"><a href="#cb16-49" aria-hidden="true" tabindex="-1"></a>      <span class="at">.groups =</span> <span class="st">"drop"</span></span>
+<span id="cb16-50"><a href="#cb16-50" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
+<span id="cb16-51"><a href="#cb16-51" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">p_lbl =</span> <span class="fu">formatC</span>(p, <span class="at">format =</span> <span class="st">"e"</span>, <span class="at">digits =</span> <span class="dv">2</span>))</span>
+<span id="cb16-52"><a href="#cb16-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-53"><a href="#cb16-53" aria-hidden="true" tabindex="-1"></a>  detect <span class="sc">%&gt;%</span></span>
+<span id="cb16-54"><a href="#cb16-54" aria-hidden="true" tabindex="-1"></a>    <span class="fu">left_join</span>(summary, <span class="at">by =</span> <span class="st">"arm"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb16-55"><a href="#cb16-55" aria-hidden="true" tabindex="-1"></a>    <span class="fu">left_join</span>(pval, <span class="at">by =</span> <span class="st">"arm"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb16-56"><a href="#cb16-56" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">bacteria =</span> bacteria_name, <span class="at">.before =</span> <span class="dv">1</span>)</span>
+<span id="cb16-57"><a href="#cb16-57" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb16-58"><a href="#cb16-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-59"><a href="#cb16-59" aria-hidden="true" tabindex="-1"></a>master <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
+<span id="cb16-60"><a href="#cb16-60" aria-hidden="true" tabindex="-1"></a>  <span class="fu">build_bacteria_table</span>(<span class="st">"Total bacteria"</span>),</span>
+<span id="cb16-61"><a href="#cb16-61" aria-hidden="true" tabindex="-1"></a>  <span class="fu">build_bacteria_table</span>(<span class="st">"L. crispatus"</span>),</span>
+<span id="cb16-62"><a href="#cb16-62" aria-hidden="true" tabindex="-1"></a>  <span class="fu">build_bacteria_table</span>(<span class="st">"L. iners"</span>)</span>
+<span id="cb16-63"><a href="#cb16-63" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span></span>
+<span id="cb16-64"><a href="#cb16-64" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(</span>
+<span id="cb16-65"><a href="#cb16-65" aria-hidden="true" tabindex="-1"></a>    <span class="at">Bacteria =</span> bacteria,</span>
+<span id="cb16-66"><a href="#cb16-66" aria-hidden="true" tabindex="-1"></a>    <span class="at">Arm =</span> arm,</span>
+<span id="cb16-67"><a href="#cb16-67" aria-hidden="true" tabindex="-1"></a>    <span class="at">N =</span> n_total,</span>
+<span id="cb16-68"><a href="#cb16-68" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Baseline detected, n (%)"</span> <span class="ot">=</span> baseline_lbl,</span>
+<span id="cb16-69"><a href="#cb16-69" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Baseline median (IQR)"</span> <span class="ot">=</span> bl_med_iqr,</span>
+<span id="cb16-70"><a href="#cb16-70" aria-hidden="true" tabindex="-1"></a>    <span class="st">"After antibiotic detected, n (%)"</span> <span class="ot">=</span> after_lbl,</span>
+<span id="cb16-71"><a href="#cb16-71" aria-hidden="true" tabindex="-1"></a>    <span class="st">"After antibiotic median (IQR)"</span> <span class="ot">=</span> aft_med_iqr,</span>
+<span id="cb16-72"><a href="#cb16-72" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Paired p-value"</span> <span class="ot">=</span> p_lbl</span>
+<span id="cb16-73"><a href="#cb16-73" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb16-74"><a href="#cb16-74" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-75"><a href="#cb16-75" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(master, <span class="at">caption =</span> <span class="st">"Table 4: Complete summary — all bacteria, detection rates, levels, and paired p-values"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Table 4: Complete summary — all bacteria, detection rates, levels, and paired p-values</caption>
+<colgroup>
+<col style="width: 9%">
+<col style="width: 9%">
+<col style="width: 1%">
+<col style="width: 15%">
+<col style="width: 14%">
+<col style="width: 20%">
+<col style="width: 18%">
+<col style="width: 9%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Bacteria</th>
+<th style="text-align: left;">Arm</th>
+<th style="text-align: right;">N</th>
+<th style="text-align: left;">Baseline detected, n (%)</th>
+<th style="text-align: left;">Baseline median (IQR)</th>
+<th style="text-align: left;">After antibiotic detected, n (%)</th>
+<th style="text-align: left;">After antibiotic median (IQR)</th>
+<th style="text-align: left;">Paired p-value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Total bacteria</td>
+<td style="text-align: left;">Unchanged diet</td>
+<td style="text-align: right;">25</td>
+<td style="text-align: left;">25/25 (100%)</td>
+<td style="text-align: left;">6,596,612 (14,545,636)</td>
+<td style="text-align: left;">25/25 (100%)</td>
+<td style="text-align: left;">451,009.4 (676,803)</td>
+<td style="text-align: left;">1.48e-05</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Total bacteria</td>
+<td style="text-align: left;">Yogurt</td>
+<td style="text-align: right;">26</td>
+<td style="text-align: left;">26/26 (100%)</td>
+<td style="text-align: left;">9,057,726 (13,127,655)</td>
+<td style="text-align: left;">26/26 (100%)</td>
+<td style="text-align: left;">145,586.1 (311,657.9)</td>
+<td style="text-align: left;">8.80e-06</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">L. crispatus</td>
+<td style="text-align: left;">Unchanged diet</td>
+<td style="text-align: right;">25</td>
+<td style="text-align: left;">1/25 (4%)</td>
+<td style="text-align: left;">0 (0)</td>
+<td style="text-align: left;">12/25 (48%)</td>
+<td style="text-align: left;">0 (11,636.09)</td>
+<td style="text-align: left;">5.74e-03</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">L. crispatus</td>
+<td style="text-align: left;">Yogurt</td>
+<td style="text-align: right;">26</td>
+<td style="text-align: left;">1/26 (4%)</td>
+<td style="text-align: left;">0 (0)</td>
+<td style="text-align: left;">22/26 (85%)</td>
+<td style="text-align: left;">434.336 (48,575.99)</td>
+<td style="text-align: left;">4.29e-05</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">L. iners</td>
+<td style="text-align: left;">Unchanged diet</td>
+<td style="text-align: right;">25</td>
+<td style="text-align: left;">24/25 (96%)</td>
+<td style="text-align: left;">89.092 (3,766.872)</td>
+<td style="text-align: left;">25/25 (100%)</td>
+<td style="text-align: left;">296,150.7 (264,609.3)</td>
+<td style="text-align: left;">1.67e-05</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">L. iners</td>
+<td style="text-align: left;">Yogurt</td>
+<td style="text-align: right;">26</td>
+<td style="text-align: left;">19/26 (73%)</td>
+<td style="text-align: left;">12.24 (968.3445)</td>
+<td style="text-align: left;">26/26 (100%)</td>
+<td style="text-align: left;">317,714.3 (524,453.6)</td>
+<td style="text-align: left;">2.40e-05</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="bonus-all-three-bacteria-in-one-figure" class="level2">
+<h2 class="anchored" data-anchor-id="bonus-all-three-bacteria-in-one-figure">Bonus: All three bacteria in one figure</h2>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute all paired p-values at once using the wider format</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>all_paired <span class="ot">&lt;-</span> df_long <span class="sc">%&gt;%</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(pid, arm, bacteria, time_point, value) <span class="sc">%&gt;%</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> time_point, <span class="at">values_from =</span> value)</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>all_pvals <span class="ot">&lt;-</span> all_paired <span class="sc">%&gt;%</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(bacteria, arm) <span class="sc">%&gt;%</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">p =</span> <span class="fu">wilcox.test</span>(Baseline, <span class="st">`</span><span class="at">After antibiotic</span><span class="st">`</span>, <span class="at">paired =</span> <span class="cn">TRUE</span>, <span class="at">exact =</span> <span class="cn">FALSE</span>)<span class="sc">$</span>p.value,</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">label =</span> <span class="fu">paste0</span>(<span class="st">"p = "</span>, <span class="fu">formatC</span>(p, <span class="at">format =</span> <span class="st">"e"</span>, <span class="at">digits =</span> <span class="dv">2</span>)))</span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>all_ymax <span class="ot">&lt;-</span> df_long <span class="sc">%&gt;%</span></span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(bacteria, arm) <span class="sc">%&gt;%</span></span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">max_val =</span> <span class="fu">max</span>(value, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">*</span> <span class="fl">1.15</span>, <span class="at">.groups =</span> <span class="st">"drop"</span>)</span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>all_pvals <span class="ot">&lt;-</span> all_pvals <span class="sc">%&gt;%</span> <span class="fu">left_join</span>(all_ymax, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"bacteria"</span>, <span class="st">"arm"</span>))</span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(df_long, <span class="fu">aes</span>(<span class="at">x =</span> time_point, <span class="at">y =</span> value)) <span class="sc">+</span></span>
+<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">group =</span> pid), <span class="at">color =</span> <span class="st">"grey60"</span>, <span class="at">alpha =</span> <span class="fl">0.3</span>, <span class="at">linewidth =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="fu">aes</span>(<span class="at">fill =</span> arm), <span class="at">outlier.shape =</span> <span class="cn">NA</span>, <span class="at">alpha =</span> <span class="fl">0.4</span>, <span class="at">width =</span> <span class="fl">0.4</span>) <span class="sc">+</span></span>
+<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">color =</span> arm), <span class="at">size =</span> <span class="fl">1.8</span>, <span class="at">alpha =</span> <span class="fl">0.6</span>) <span class="sc">+</span></span>
+<span id="cb17-24"><a href="#cb17-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_grid</span>(bacteria <span class="sc">~</span> arm, <span class="at">scales =</span> <span class="st">"free_y"</span>) <span class="sc">+</span></span>
+<span id="cb17-25"><a href="#cb17-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"Unchanged diet"</span> <span class="ot">=</span> <span class="st">"#4A90D9"</span>, <span class="st">"Yogurt"</span> <span class="ot">=</span> <span class="st">"#E8833A"</span>)) <span class="sc">+</span></span>
+<span id="cb17-26"><a href="#cb17-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"Unchanged diet"</span> <span class="ot">=</span> <span class="st">"#4A90D9"</span>, <span class="st">"Yogurt"</span> <span class="ot">=</span> <span class="st">"#E8833A"</span>)) <span class="sc">+</span></span>
+<span id="cb17-27"><a href="#cb17-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(</span>
+<span id="cb17-28"><a href="#cb17-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">data    =</span> all_pvals,</span>
+<span id="cb17-29"><a href="#cb17-29" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">x =</span> <span class="fl">2.3</span>, <span class="at">y =</span> max_val, <span class="at">label =</span> label),</span>
+<span id="cb17-30"><a href="#cb17-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">inherit.aes =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb17-31"><a href="#cb17-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">hjust =</span> <span class="dv">1</span>, <span class="at">vjust =</span> <span class="dv">1</span>, <span class="at">size =</span> <span class="fl">3.2</span>, <span class="at">color =</span> <span class="st">"grey30"</span></span>
+<span id="cb17-32"><a href="#cb17-32" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb17-33"><a href="#cb17-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb17-34"><a href="#cb17-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">title    =</span> <span class="st">"qPCR Bacteria — Paired Change Over Time"</span>,</span>
+<span id="cb17-35"><a href="#cb17-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"How each participant's bacteria changed from baseline to after antibiotic, by arm"</span>,</span>
+<span id="cb17-36"><a href="#cb17-36" aria-hidden="true" tabindex="-1"></a>    <span class="at">x        =</span> <span class="cn">NULL</span>,</span>
+<span id="cb17-37"><a href="#cb17-37" aria-hidden="true" tabindex="-1"></a>    <span class="at">y        =</span> <span class="st">"Bacterial load (copies/mL)"</span></span>
+<span id="cb17-38"><a href="#cb17-38" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb17-39"><a href="#cb17-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>(<span class="at">base_size =</span> <span class="dv">13</span>) <span class="sc">+</span></span>
+<span id="cb17-40"><a href="#cb17-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb17-41"><a href="#cb17-41" aria-hidden="true" tabindex="-1"></a>    <span class="at">strip.text       =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">"bold"</span>, <span class="at">size =</span> <span class="dv">11</span>),</span>
+<span id="cb17-42"><a href="#cb17-42" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title       =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">"bold"</span>, <span class="at">hjust =</span> <span class="fl">0.5</span>, <span class="at">size =</span> <span class="dv">15</span>),</span>
+<span id="cb17-43"><a href="#cb17-43" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.subtitle    =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>, <span class="at">color =</span> <span class="st">"grey40"</span>),</span>
+<span id="cb17-44"><a href="#cb17-44" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.position  =</span> <span class="st">"bottom"</span></span>
+<span id="cb17-45"><a href="#cb17-45" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="07-yogurt-bacteria-paired_files/figure-html/plot-all-bacteria-1.png" class="img-fluid figure-img" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+<hr>
+</section>
+<section id="how-to-re-run-this-tomorrow" class="level2">
+<h2 class="anchored" data-anchor-id="how-to-re-run-this-tomorrow">How to re-run this tomorrow</h2>
+<p>Open this file in RStudio and click the <strong>Render</strong> button (or <code>Ctrl</code>/<code>Cmd</code> + <code>Shift</code> + <code>K</code>). Quarto will run all the code and create an HTML file with the tables and plots.</p>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

@@ -30,24 +30,24 @@ For each non-pid column of `table_01` (`arm`, `smoker`, `age`, `education`, `sex
 
 **1. `arm`**
 
-- How will `tbl_summary(by = arm)` summarise it? *Your answer:*
-- What test will `add_p()` pick? *Your answer:*
+- How will `tbl_summary(by = arm)` summarise it? *Your answer:* There will just be arm two rows with placebo and treatment, and the n (%) of participants in each arm.
+- What test will `add_p()` pick? *Your answer:* This will show the p value for the chi-squared test of independence, which tests whether there is a significant association between the treatment arm and the number of participants in each arm. Since this is a randomised trial, we would expect no significant association (i.e., a high p-value).
 
 **2. `smoker`**
 
-- *Your answer (summary, test):*
+- *Your answer (summary, test):* This will show the number and percentage of smokers and non-smokers in each arm. The p-value will be from a chi-squared test of independence, testing whether there is a significant association between smoking status and treatment arm. 
 
 **3. `age`**
 
-- *Your answer (summary, test):*
+- *Your answer (summary, test):* This will show the median and interquartile range (IQR) of age for each arm. The p-value will test whether there is a significant difference in age distributions between the two arms. 
 
 **4. `education`**
 
-- *Your answer (summary, test):*
+- *Your answer (summary, test):* This will show the number and percentage of participants with different education levels in each arm. The p-value will be testing whether there is a significant association between education level and treatment arm. Not sure how it will show this as education has many levels.
 
 **5. `sex`**
 
-- *Your answer (summary, test):*
+- *Your answer (summary, test):* This will show the number and percentage of females and males even though the table only has females. Females will be 100% in both arms. However a p value will only be calculated between the arms and so a difference in number and percentage of smokers and non-smokers will be tested.
 
 ## Part 2 — Build
 

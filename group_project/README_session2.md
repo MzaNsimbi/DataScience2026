@@ -1,9 +1,7 @@
 # Group Project — Session 2: Table 1 and group comparisons
 
 This session is about turning curiosity into analysis. Pick a biological
-question your group cares about, build a **Table 1** to describe the
-participants, then use **gtsummary** and **ggpubr** to compare groups and
-show results with p-values.
+question your group cares about,
 
 ## Questions to answer as a group
 

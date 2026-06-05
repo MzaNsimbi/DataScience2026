@@ -1,0 +1,284 @@
+---
+title: "Twin Paired Box Plots — Male & Female Twins Over Time"
+author: "Intro to R for Data Science with LLMs"
+format: html
+editor: source
+---
+
+## Overview
+
+This notebook simulates **twin paired data**: male–female twin pairs measured at
+baseline (visit 0) and up to 10 follow-up visits. The discrepancy between male
+and female twins varies across visits — some visits show little difference, 
+others show clearer separation.
+
+The data is split into **long format** so we can easily facet by visit and
+compare the distributions of male vs female twins at each time point.
+
+```{r setup, message=FALSE, warning=FALSE}
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(ggpubr)
+library(rstatix)
+
+set.seed(42)  # reproducible
+
+knitr::opts_chunk$set(fig.width = 12, fig.height = 7, dpi = 200)
+```
+
+---
+
+## 1. Simulate twin paired data
+
+Each **twin pair** shares a genetic baseline. Then we add:
+- A **sex effect** (male or female)
+- A **visit effect** that changes over time
+- A **time × sex interaction** so the male–female gap varies per visit
+- Random noise
+
+```{r simulate}
+n_pairs   <- 25           # number of twin pairs
+n_visits  <- 11           # visits 0 through 10
+total_obs <- n_pairs * 2 * n_visits  # 2 sexes × 11 visits
+
+# ── Per-pair genetic baseline (shared by both twins) ─────
+pair_id <- rep(1:n_pairs, each = 2 * n_visits)
+genetic_baseline <- rep(rnorm(n_pairs, mean = 50, sd = 10),
+                        each = 2 * n_visits)
+
+# ── Sex label (each pair: one male, one female) ──────────
+# For each pair, first half of rows = female, second half = male
+sex <- rep(rep(c("Female", "Male"), each = n_visits), times = n_pairs)
+
+# ── Visit number (0 to 10) ────────────────────────────────
+visit <- rep(0:(n_visits - 1), times = n_pairs * 2)
+
+# ── Sex effect: males start slightly higher ──────────────
+sex_effect <- ifelse(sex == "Male", 5, 0)
+
+# ── Visit effect: gentle upward trend ────────────────────
+visit_effect <- visit * 0.5
+
+# ── Time × sex interaction (varies per visit) ────────────
+# We create a pattern where the male–female gap changes:
+#   visit 0: small gap   visit 3: large gap   visit 6: reversed
+#   visit 9: large gap   visit 10: small gap
+interaction_pattern <- data.frame(
+  visit = 0:10,
+  interaction = c(0, 1, 3, 6, 4, 2, -2, 1, 4, 7, 2)
+)
+interaction_map <- interaction_pattern$interaction[match(visit, interaction_pattern$visit)]
+time_x_sex <- ifelse(sex == "Male", interaction_map, 0)
+
+# ── Random noise ──────────────────────────────────────────
+noise <- rnorm(total_obs, mean = 0, sd = 4)
+
+# ── Assemble the data frame ───────────────────────────────
+twins <- data.frame(
+  pair     = pair_id,
+  sex      = sex,
+  visit    = visit,
+  value    = genetic_baseline + sex_effect + visit_effect + time_x_sex + noise
+)
+
+# Also create a wide format to show the pairing
+twins_wide <- twins %>%
+  pivot_wider(
+    id_cols     = c(pair, visit),
+    names_from  = sex,
+    values_from = value,
+    names_prefix = ""
+  )
+
+# Quick peek at the structure
+glimpse(twins)
+```
+
+Let's look at a few twin pairs to see the pattern:
+
+```{r peek, echo=FALSE}
+twins_wide %>%
+  filter(pair <= 4) %>%
+  mutate(across(c(Female, Male), ~ round(., 1))) %>%
+  knitr::kable(caption = "First 4 twin pairs across all visits (wide format)")
+```
+
+---
+
+## 2. Box plot: male vs female at each visit
+
+Side-by-side box plots for every visit, faceted so you can watch the gap
+change over time.
+
+```{r boxplot, warning=FALSE}
+# Convert visit to a factor so ggplot treats it as a category
+twins$visit <- factor(twins$visit, levels = 0:10,
+                      labels = paste0("Visit ", 0:10))
+
+p_box <- twins %>%
+  ggplot(aes(x = sex, y = value, fill = sex)) +
+  geom_boxplot(outlier.shape = NA, alpha = 0.55, width = 0.5) +
+  geom_jitter(aes(color = sex),
+              width = 0.12, size = 1.2, alpha = 0.4) +
+  facet_wrap(~ visit, nrow = 3) +
+  scale_fill_manual(values = c("Female" = "#D95F69", "Male" = "#5B9BD5")) +
+  scale_color_manual(values = c("Female" = "#D95F69", "Male" = "#5B9BD5")) +
+  labs(
+    title    = "Male vs Female Twins Over Time",
+    subtitle = "Each panel = one visit. The male–female gap varies across visits.",
+    x        = NULL,
+    y        = "Measurement value",
+    fill     = "Sex",
+    color    = "Sex"
+  ) +
+  theme_bw(base_size = 13) +
+  theme(
+    strip.text = element_text(face = "bold", size = 11),
+    plot.title = element_text(face = "bold", hjust = 0.5),
+    plot.subtitle = element_text(hjust = 0.5, color = "grey40"),
+    legend.position = "bottom"
+  )
+
+print(p_box)
+```
+
+---
+
+## 3. Paired box plot — connecting each twin pair
+
+This version draws **paired points** connected by lines so you can see the
+within-pair difference (dots connected with a line).
+
+```{r paired-boxplot, warning=FALSE}
+# Only show a subset of visits to avoid overcrowding
+visits_to_show <- c("Visit 0", "Visit 2", "Visit 4", "Visit 6", "Visit 8", "Visit 10")
+
+# Use the long-format data directly.
+# geom_line(aes(group = pair)) connects the two points (Female, Male) within each twin pair.
+p_paired <- twins %>%
+  filter(visit %in% visits_to_show) %>%
+  ggplot(aes(x = sex, y = value)) +
+  geom_boxplot(aes(fill = sex), outlier.shape = NA, alpha = 0.4, width = 0.4) +
+  geom_line(aes(group = pair), color = "grey50", alpha = 0.5, linewidth = 0.3) +
+  geom_point(aes(color = sex), size = 1.5, alpha = 0.7) +
+  facet_wrap(~ visit, nrow = 2) +
+  scale_fill_manual(values = c(Female = "#D95F69", Male = "#5B9BD5")) +
+  scale_color_manual(values = c(Female = "#D95F69", Male = "#5B9BD5")) +
+  labs(
+    title    = "Paired Twin Data — Each Line Connects One Twin Pair",
+    subtitle = "Male–female differences within each twin pair. Gap changes over visits.",
+    x        = NULL,
+    y        = "Measurement value",
+    fill     = "Sex",
+    color    = "Sex"
+  ) +
+  theme_bw(base_size = 13) +
+  theme(
+    strip.text = element_text(face = "bold", size = 11),
+    plot.title = element_text(face = "bold", hjust = 0.5),
+    plot.subtitle = element_text(hjust = 0.5, color = "grey40"),
+    legend.position = "bottom"
+  )
+
+print(p_paired)
+```
+
+---
+
+## 4. Statistical tests per visit
+
+Let's check how the p-values (t-test and Wilcoxon) change across visits,
+reflecting the varying discrepancy between male and female twins.
+
+```{r pvalues, warning=FALSE}
+pvals <- twins %>%
+  group_by(visit) %>%
+  summarise(
+    n_female    = sum(sex == "Female"),
+    n_male      = sum(sex == "Male"),
+    mean_female = mean(value[sex == "Female"], na.rm = TRUE),
+    mean_male   = mean(value[sex == "Male"], na.rm = TRUE),
+    diff        = mean_male - mean_female,
+    t_pval      = tryCatch(t.test(value ~ sex)$p.value,
+                           error = function(e) NA),
+    wilcox_pval = tryCatch(wilcox.test(value ~ sex)$p.value,
+                           error = function(e) NA),
+    .groups = "drop"
+  ) %>%
+  mutate(
+    across(ends_with("pval"), ~ round(., 4)),
+    t_label      = paste0("t-test p = ", t_pval),
+    wilcox_label = paste0("Wilcoxon p = ", wilcox_pval)
+  )
+
+knitr::kable(pvals %>% select(visit, n_female, n_male, diff, t_label, wilcox_label),
+             caption = "Male–female difference and p-values at each visit")
+```
+
+---
+
+## 5. Summary plot with p-values on the panels
+
+Finally, a cleaner box plot with p-values printed directly on each panel.
+
+```{r summary-plot, warning=FALSE}
+# Prepare annotation data
+pvals_annot <- pvals %>%
+  mutate(
+    combined_label = paste0(t_label, "\n", wilcox_label),
+    # Position text in the top-right of each panel
+    x_pos = 2.3
+  )
+
+# Find y_max for each panel
+y_max_vals <- twins %>%
+  group_by(visit) %>%
+  summarise(y_max = max(value, na.rm = TRUE) * 1.15, .groups = "drop")
+
+pvals_annot <- pvals_annot %>%
+  left_join(y_max_vals, by = "visit")
+
+p_summary <- twins %>%
+  ggplot(aes(x = sex, y = value, fill = sex)) +
+  geom_boxplot(outlier.shape = NA, alpha = 0.55, width = 0.5) +
+  geom_jitter(width = 0.12, size = 1.2, alpha = 0.4, color = "grey30") +
+  geom_text(
+    data = pvals_annot,
+    aes(x = 2.3, y = y_max, label = combined_label),
+    inherit.aes = FALSE,
+    hjust = 1, vjust = 1, size = 2.8, color = "grey40"
+  ) +
+  facet_wrap(~ visit, nrow = 3) +
+  scale_fill_manual(values = c("Female" = "#D95F69", "Male" = "#5B9BD5")) +
+  labs(
+    title    = "Male vs Female Twins — With Statistical Tests",
+    subtitle = "t-test and Wilcoxon p-values shown per visit",
+    x        = NULL,
+    y        = "Measurement value",
+    fill     = "Sex"
+  ) +
+  theme_bw(base_size = 13) +
+  theme(
+    strip.text = element_text(face = "bold", size = 11),
+    plot.title = element_text(face = "bold", hjust = 0.5),
+    plot.subtitle = element_text(hjust = 0.5, color = "grey40"),
+    legend.position = "bottom"
+  )
+
+print(p_summary)
+```
+
+---
+
+**Key takeaways:**
+
+- The **gap between male and female twins changes over visits** — some visits
+  show a big difference (e.g., visits 3, 9, 10), others show almost none
+  (e.g., visit 6 where the gap reverses direction).
+- The **paired lines** in section 3 highlight that these are *matched* pairs
+  sharing a genetic baseline — so the within-pair difference is the cleanest
+  signal.
+- The p-values in section 4 confirm: at some visits the difference is
+  statistically significant, at others it isn't, matching the varying
+  discrepancy pattern we built into the simulation.
